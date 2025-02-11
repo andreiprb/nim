@@ -192,7 +192,7 @@ class AlphaZeroAgent:
             game[action[0]] -= action[1]
             current_player = 1 - current_player
 
-        game_result = 1 if current_player == 1 else -1
+        game_result = -1 if current_player == 1 else 1
         values = [game_result * (1 if i % 2 == 0 else -1) for i in range(len(states))]
 
         return states, policies, values
