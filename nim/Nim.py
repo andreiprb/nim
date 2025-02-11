@@ -5,7 +5,7 @@ from agents.MinimaxAgent import MinimaxAgent
 from nim.NimLogic import NimLogic
 
 
-AGENT = AlphaZeroAgent
+AGENT = QLearningAgent
 
 
 class Nim:
@@ -83,6 +83,9 @@ def train(n):
                     new_state,
                     0
                 )
+
+        if (i + 1) % 100 == 0:
+            print(f"Completed training episode {i + 1}")
 
     print("Done training")
 
