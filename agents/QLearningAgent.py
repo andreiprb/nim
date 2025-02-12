@@ -90,5 +90,3 @@ class QLearningAgent:
 
             if (i + 1) % 1000 == 0:
                 print(f"Completed training episode {i + 1}")
-
-        print("Done training")
