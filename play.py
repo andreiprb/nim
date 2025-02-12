@@ -4,7 +4,7 @@ import random
 
 
 if __name__ == '__main__':
-    ai_player = train(10000)
+    ai_player = train()
     human_player = random.randint(0, 1)
 
     game = Nim()

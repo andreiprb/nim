@@ -1,4 +1,5 @@
 from nim.NimLogic import NimLogic
+from nim.NimGameState import NimGameState
 
 import random
 
@@ -48,3 +49,46 @@ class QLearningAgent:
             return random.choice(tuple(actions))
 
         return best[1]
+
+    def train(self, num_episodes=10000):
+        print(f"Training Q-Learning agent for {num_episodes} episodes...")
+
+        for i in range(num_episodes):
+            state = NimGameState()
+
+            last = {
+                0: {"state": None, "action": None},
+                1: {"state": None, "action": None}
+            }
+
+            while True:
+                current_piles = state.piles.copy()
+                action = self.choose_action(current_piles)
+
+                last[state.player]["state"] = current_piles
+                last[state.player]["action"] = action
+
+                state = state.apply_move(action)
+
+                if state.winner is not None:
+                    self.update(current_piles, action, state.piles, -1)
+                    self.update(
+                        last[state.player]["state"],
+                        last[state.player]["action"],
+                        state.piles,
+                        1
+                    )
+                    break
+
+                elif last[state.player]["state"] is not None:
+                    self.update(
+                        last[state.player]["state"],
+                        last[state.player]["action"],
+                        state.piles,
+                        0
+                    )
+
+            if (i + 1) % 1000 == 0:
+                print(f"Completed training episode {i + 1}")
+
+        print("Done training")
