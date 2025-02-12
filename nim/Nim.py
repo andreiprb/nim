@@ -1,12 +1,13 @@
 from agents.QLearningAgent import QLearningAgent
 from agents.AlphaZeroAgent import AlphaZeroAgent
 from agents.MinimaxAgent import MinimaxAgent
+from agents.A3CAgent import A3CAgent
 
 from nim.NimGameState import NimGameState
 from nim.NimLogic import NimLogic
 
 
-AGENT = AlphaZeroAgent
+AGENT = A3CAgent
 
 
 class Nim:
