@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
+import math, os
 
 
 class NimNet(nn.Module):
@@ -130,6 +130,21 @@ class AlphaZeroAgent:
     def __init__(self, num_piles=4, max_pile_size=7, num_simulations=100):
         self.model = NimNet(num_piles, max_pile_size)
         self.mcts = MCTS(self.model, num_simulations)
+        self.save_path = "savedAgents/alphazero.pth"
+
+        os.makedirs("savedAgents", exist_ok=True)
+
+        if os.path.exists(self.save_path):
+            self.load_model()
+
+    def save_model(self):
+        torch.save(self.model.state_dict(), self.save_path)
+        print(f"Model saved to {self.save_path}")
+
+    def load_model(self):
+        self.model.load_state_dict(torch.load(self.save_path))
+        self.model.eval()
+        print(f"Model loaded from {self.save_path}")
 
     def choose_action(self, state, epsilon=None):
         root = self.mcts.search(state)
@@ -137,7 +152,11 @@ class AlphaZeroAgent:
         visits = {action: child.visit_count for action, child in root.children.items()}
         return max(visits.items(), key=lambda x: x[1])[0]
 
-    def train(self, num_episodes=1000, batch_size=32):
+    def train(self, num_episodes=2500, batch_size=32):
+        if os.path.exists(self.save_path):
+            print(f"Model already exists at {self.save_path}. Skipping training.")
+            return
+
         print(f"Training AlphaZero agent for {num_episodes} episodes...")
 
         optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
@@ -169,6 +188,8 @@ class AlphaZeroAgent:
 
             if (episode + 1) % 100 == 0:
                 print(f"Completed training episode {episode + 1}")
+                
+        self.save_model()
 
     def _self_play(self):
         game = [1, 3, 5, 7]
