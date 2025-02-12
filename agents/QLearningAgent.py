@@ -85,7 +85,6 @@ class QLearningAgent:
 
     def train(self, num_episodes=10000):
         if os.path.exists(self.save_path):
-            print(f"Q-values already exist at {self.save_path}. Skipping training.")
             return
 
         print(f"Training Q-Learning agent for {num_episodes} episodes...")

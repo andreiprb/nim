@@ -104,11 +104,11 @@ class MCTS:
                         prior = policy[0, action_idx].item()
                         node.children[action] = MCTSNode(next_state, prior, node)
             else:
-                value = 1.0 if self._is_winning(node.state, node.player) else -1.0
+                value = 1.0
 
             for node in reversed(path):
-                node.value_sum += value if node.player == 0 else -value
                 node.visit_count += 1
+                node.value_sum += value
                 value = -value
 
         return root
@@ -121,9 +121,6 @@ class MCTS:
 
     def _is_terminal(self, state):
         return all(pile == 0 for pile in state)
-
-    def _is_winning(self, state, player):
-        return player == 0
 
 
 class AlphaZeroAgent:
@@ -152,9 +149,8 @@ class AlphaZeroAgent:
         visits = {action: child.visit_count for action, child in root.children.items()}
         return max(visits.items(), key=lambda x: x[1])[0]
 
-    def train(self, num_episodes=2500, batch_size=32):
+    def train(self, num_episodes=10000, batch_size=32):
         if os.path.exists(self.save_path):
-            print(f"Model already exists at {self.save_path}. Skipping training.")
             return
 
         print(f"Training AlphaZero agent for {num_episodes} episodes...")
@@ -179,14 +175,14 @@ class AlphaZeroAgent:
                 optimizer.zero_grad()
                 policy_out, value_out = self.model(batch_states)
 
-                policy_loss = F.cross_entropy(policy_out, batch_policies)
+                policy_loss = F.kl_div(torch.log(policy_out), batch_policies, reduction='batchmean')
                 value_loss = F.mse_loss(value_out.squeeze(), batch_values)
                 total_loss = policy_loss + value_loss
 
                 total_loss.backward()
                 optimizer.step()
 
-            if (episode + 1) % 100 == 0:
+            if (episode + 1) % 1000 == 0:
                 print(f"Completed training episode {episode + 1}")
                 
         self.save_model()

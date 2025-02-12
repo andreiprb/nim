@@ -6,7 +6,7 @@ from nim.NimGameState import NimGameState
 from nim.NimLogic import NimLogic
 
 
-AGENT = QLearningAgent
+AGENT = AlphaZeroAgent
 
 
 class Nim:
