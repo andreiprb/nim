@@ -124,9 +124,9 @@ class MCTS:
 
 
 class AlphaZeroAgent:
-    def __init__(self, num_piles=4, max_pile_size=7, num_simulations=100):
+    def __init__(self, num_piles=4, max_pile_size=7):
         self.model = NimNet(num_piles, max_pile_size)
-        self.mcts = MCTS(self.model, num_simulations)
+        self.mcts = MCTS(self.model)
         self.save_path = "savedAgents/alphazero.pth"
 
         os.makedirs("savedAgents", exist_ok=True)
