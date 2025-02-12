@@ -30,7 +30,11 @@ class A3CNet(nn.Module):
 
     def forward(self, x):
         x = self.shared(x)
-        policy = F.softmax(self.policy(x), dim=1)
+
+        policy_logits = self.policy(x)
+        policy_logits = policy_logits - policy_logits.max(dim=1, keepdim=True)[
+            0]
+        policy = F.softmax(policy_logits, dim=1)
         value = self.value(x)
         return policy, value
 
@@ -43,7 +47,7 @@ class A3CNet(nn.Module):
 
 
 class Worker(mp.Process):
-    def __init__(self, global_model, optimizer, worker_id, num_episodes=100):
+    def __init__(self, global_model, optimizer, worker_id, num_episodes):
         super(Worker, self).__init__()
         self.worker_id = worker_id
         self.num_episodes = num_episodes
@@ -55,6 +59,7 @@ class Worker(mp.Process):
         self.global_model = global_model
 
     def get_valid_action(self, policy, state):
+
         valid_actions = NimLogic.available_actions(state)
 
         valid_mask = torch.zeros_like(policy)
@@ -64,13 +69,22 @@ class Worker(mp.Process):
                 valid_mask[0, action_idx] = 1
 
         masked_policy = policy * valid_mask
-        if masked_policy.sum() > 0:
-            masked_policy = masked_policy / masked_policy.sum()
+        masked_sum = masked_policy.sum()
+
+        if masked_sum > 0 and not torch.isnan(masked_sum) and not torch.isinf(masked_sum):
+
+            masked_policy = masked_policy / (masked_sum + 1e-10)
         else:
-            for pile_idx, count in valid_actions:
-                action_idx = pile_idx * self.local_model.max_pile_size + (count - 1)
-                if action_idx < masked_policy.size(1):
-                    masked_policy[0, action_idx] = 1.0 / len(valid_actions)
+
+            masked_policy = torch.zeros_like(policy)
+            count_valid = sum(1 for pile_idx, count in valid_actions
+                              if pile_idx * self.local_model.max_pile_size + (count - 1) < masked_policy.size(1))
+            if count_valid > 0:
+                prob_value = 1.0 / count_valid
+                for pile_idx, count in valid_actions:
+                    action_idx = pile_idx * self.local_model.max_pile_size + (count - 1)
+                    if action_idx < masked_policy.size(1):
+                        masked_policy[0, action_idx] = prob_value
 
         m = Categorical(masked_policy)
         action_idx = m.sample()
@@ -138,9 +152,9 @@ class Worker(mp.Process):
             policy_loss = 0
             value_loss = 0
 
-            for log_prob, R, advantage in zip(log_probs, returns, advantages):
+            for log_prob, v, R, advantage in zip(log_probs, values, returns, advantages):
                 policy_loss -= log_prob * advantage
-                value_loss += F.smooth_l1_loss(value, torch.tensor([[R]]))
+                value_loss += F.smooth_l1_loss(v, torch.tensor([[R]]))
 
             total_loss = policy_loss + 0.5 * value_loss
 
@@ -158,8 +172,7 @@ class Worker(mp.Process):
 
             self.local_model.load_state_dict(self.global_model.state_dict())
 
-            if (episode + 1) % 10 == 0:
-                print(f"Worker {self.worker_id}, Episode {episode + 1}, Total Reward: {total_reward}")
+        print(f"Worker {self.worker_id} training completed")
 
 
 class A3CAgent:
@@ -187,6 +200,7 @@ class A3CAgent:
             if masked_policy.sum() > 0:
                 masked_policy = masked_policy / masked_policy.sum()
             else:
+
                 for pile_idx, count in valid_actions:
                     action_idx = pile_idx * self.model.max_pile_size + (count - 1)
                     if action_idx < masked_policy.size(1):
@@ -201,7 +215,7 @@ class A3CAgent:
 
             return (pile_idx, count)
 
-    def train(self, num_episodes=1000):
+    def train(self, num_episodes=10000):
         print(f"Training A3C agent with {self.num_workers} workers for {num_episodes} episodes per worker...")
 
         workers = []
