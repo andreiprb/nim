@@ -1,11 +1,21 @@
 from nim.Nim import *
 
+from agents.QLearningAgent import QLearningAgent
+from agents.AlphaZeroAgent import AlphaZeroAgent
+from agents.MinimaxAgent import MinimaxAgent
+from agents.A3CAgent import A3CAgent
+from agents.LLMAgent import LLMAgent
+
 import random
+
+AGENT = LLMAgent
 
 
 if __name__ == '__main__':
-    ai_player = train()
     human_player = random.randint(0, 1)
+
+    ai_player = AGENT()
+    ai_player.train()
 
     game = Nim()
 

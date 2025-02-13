@@ -1,13 +1,5 @@
-from agents.QLearningAgent import QLearningAgent
-from agents.AlphaZeroAgent import AlphaZeroAgent
-from agents.MinimaxAgent import MinimaxAgent
-from agents.A3CAgent import A3CAgent
-
 from nim.NimGameState import NimGameState
 from nim.NimLogic import NimLogic
-
-
-AGENT = A3CAgent
 
 
 class Nim:
@@ -28,14 +20,3 @@ class Nim:
 
     def move(self, action):
         self.state = self.state.apply_move(action)
-
-
-def train():
-    player = AGENT()
-
-    if AGENT is MinimaxAgent:
-        print("Playing versus Minimax agent. Nothing to train.")
-        return player
-
-    player.train()
-    return player

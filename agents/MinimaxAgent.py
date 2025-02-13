@@ -59,3 +59,6 @@ class MinimaxAgent:
                 if beta <= alpha:
                     break
             return value
+
+    def train(self):
+        print("Playing versus Minimax agent. Nothing to train.")
