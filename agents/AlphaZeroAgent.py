@@ -7,9 +7,9 @@ import torch.nn.functional as F
 import math, os
 
 
-class NimNet(nn.Module):
+class AlphaZeroNet(nn.Module):
     def __init__(self, num_piles=4, max_pile_size=7):
-        super(NimNet, self).__init__()
+        super(AlphaZeroNet, self).__init__()
         self.num_piles = num_piles
         self.max_pile_size = max_pile_size
 
@@ -125,7 +125,7 @@ class MCTS:
 
 class AlphaZeroAgent:
     def __init__(self, num_piles=4, max_pile_size=7):
-        self.model = NimNet(num_piles, max_pile_size)
+        self.model = AlphaZeroNet(num_piles, max_pile_size)
         self.mcts = MCTS(self.model)
         self.save_path = "savedAgents/alphazero.pth"
 

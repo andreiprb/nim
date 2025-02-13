@@ -34,7 +34,7 @@ def train():
     player = AGENT()
 
     if AGENT is MinimaxAgent:
-        print("Playing versus Minimax agent")
+        print("Playing versus Minimax agent. Nothing to train.")
         return player
 
     player.train()

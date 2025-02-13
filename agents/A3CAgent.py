@@ -1,4 +1,4 @@
-import random
+import random, os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -59,9 +59,9 @@ class Worker(mp.Process):
         self.global_model = global_model
 
     def get_valid_action(self, policy, state):
-
         valid_actions = NimLogic.available_actions(state)
 
+        # Construim masca (valid_mask)...
         valid_mask = torch.zeros_like(policy)
         for pile_idx, count in valid_actions:
             action_idx = pile_idx * self.local_model.max_pile_size + (count - 1)
@@ -72,13 +72,14 @@ class Worker(mp.Process):
         masked_sum = masked_policy.sum()
 
         if masked_sum > 0 and not torch.isnan(masked_sum) and not torch.isinf(masked_sum):
-
             masked_policy = masked_policy / (masked_sum + 1e-10)
         else:
-
+            # fallback la random uniform
             masked_policy = torch.zeros_like(policy)
-            count_valid = sum(1 for pile_idx, count in valid_actions
-                              if pile_idx * self.local_model.max_pile_size + (count - 1) < masked_policy.size(1))
+            count_valid = sum(
+                1 for pile_idx, count in valid_actions
+                if pile_idx * self.local_model.max_pile_size + (count - 1) < masked_policy.size(1)
+            )
             if count_valid > 0:
                 prob_value = 1.0 / count_valid
                 for pile_idx, count in valid_actions:
@@ -86,20 +87,26 @@ class Worker(mp.Process):
                     if action_idx < masked_policy.size(1):
                         masked_policy[0, action_idx] = prob_value
 
+        # Creăm distribuția folosind masked_policy
         m = Categorical(masked_policy)
         action_idx = m.sample()
         log_prob = m.log_prob(action_idx)
+        # Entropia distribuției
+        entropy = m.entropy()  # m.entropy() returnează un tensor de dimensiune [batch], aici e [1]
 
         pile_idx = action_idx.item() // self.local_model.max_pile_size
         count = (action_idx.item() % self.local_model.max_pile_size) + 1
 
+        # Verificăm un fallback suplimentar, dar ideal NU ar trebui să fie nevoie
         if count > state[pile_idx]:
             action = random.choice(list(valid_actions))
             pile_idx, count = action
             action_idx = torch.tensor(pile_idx * self.local_model.max_pile_size + (count - 1))
+            # log_prob schimbată corespunzător
             log_prob = torch.log(masked_policy[0, action_idx])
+            # Entropie nu mai e clar definită aici, dar poți pune 0 sau s-o calculezi cu noul `m`
 
-        return (pile_idx, count), log_prob
+        return (pile_idx, count), log_prob, entropy
 
     def run(self):
         for episode in range(self.num_episodes):
@@ -110,6 +117,7 @@ class Worker(mp.Process):
             values = []
             log_probs = []
             rewards = []
+            entropies = []  # Adăugăm o listă pentru entropii
 
             while not done:
                 current_state = state.piles.copy()
@@ -117,22 +125,26 @@ class Worker(mp.Process):
 
                 policy, value = self.local_model(state_tensor)
 
-                action, log_prob = self.get_valid_action(policy, current_state)
+                # Aici primim action, log_prob și entropy
+                action, log_prob, entropy = self.get_valid_action(policy, current_state)
 
                 new_state = state.apply_move(action)
 
                 reward = 0
                 if new_state.winner is not None:
+                    # Ai spus că ai inversat deja reward-ul pentru Misère
                     reward = 1 if new_state.winner == state.player else -1
                     done = True
 
                 values.append(value)
                 log_probs.append(log_prob)
                 rewards.append(reward)
+                entropies.append(entropy)
 
                 state = new_state
                 total_reward += reward
 
+            # Acum calculăm "returns" și "advantages"
             R = 0
             returns = []
             advantages = []
@@ -152,9 +164,20 @@ class Worker(mp.Process):
             policy_loss = 0
             value_loss = 0
 
-            for log_prob, v, R, advantage in zip(log_probs, values, returns, advantages):
-                policy_loss -= log_prob * advantage
-                value_loss += F.smooth_l1_loss(v, torch.tensor([[R]]))
+            # Parametru pentru entropie (îl poți face hiperparametru)
+            beta_entropy = 0.01
+
+            for log_prob, v, R, advantage, ent in zip(log_probs, values, returns, advantages, entropies):
+                # Termenul standard de policy
+                policy_loss_step = -log_prob * advantage
+                # Adăugăm entropia (cu minus, fiindcă policy_loss e minimizat)
+                # => scădem entropia => e ca și cum am adăuga un termen de entropie în objective
+                policy_loss_step -= beta_entropy * ent
+
+                value_loss_step = F.smooth_l1_loss(v, torch.tensor([[R]]))
+
+                policy_loss += policy_loss_step
+                value_loss += value_loss_step
 
             total_loss = policy_loss + 0.5 * value_loss
 
@@ -170,6 +193,7 @@ class Worker(mp.Process):
 
             self.optimizer.step()
 
+            # Sincronizăm modelul local cu cel global
             self.local_model.load_state_dict(self.global_model.state_dict())
 
         print(f"Worker {self.worker_id} training completed")
@@ -181,6 +205,21 @@ class A3CAgent:
         self.model.share_memory()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
         self.num_workers = num_workers
+        self.save_path = "savedAgents/a3c.pth"
+
+        os.makedirs("savedAgents", exist_ok=True)
+
+        if os.path.exists(self.save_path):
+            self.load_model()
+
+    def save_model(self):
+        torch.save(self.model.state_dict(), self.save_path)
+        print(f"Model saved to {self.save_path}")
+
+    def load_model(self):
+        self.model.load_state_dict(torch.load(self.save_path))
+        self.model.eval()
+        print(f"Model loaded from {self.save_path}")
 
     def choose_action(self, state, epsilon=None):
         self.model.eval()
@@ -216,6 +255,9 @@ class A3CAgent:
             return (pile_idx, count)
 
     def train(self, num_episodes=10000):
+        if os.path.exists(self.save_path):
+            return
+
         print(f"Training A3C agent with {self.num_workers} workers for {num_episodes} episodes per worker...")
 
         workers = []
@@ -228,3 +270,4 @@ class A3CAgent:
             worker.join()
 
         print("Training completed!")
+        self.save_model()
