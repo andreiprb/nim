@@ -10,4 +10,4 @@ class NimLogic(object):
 
     @staticmethod
     def other_player(player):
-        return 0 if player == 1 else 1
+        return not player

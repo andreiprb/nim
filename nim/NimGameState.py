@@ -1,3 +1,6 @@
+from nim.NimLogic import NimLogic
+
+
 class NimGameState:
     def __init__(self, initial=[1, 3, 5, 7]):
         self.piles = initial.copy()
@@ -22,7 +25,7 @@ class NimGameState:
             raise Exception("Invalid number of objects")
 
         new_state.piles[pile] -= count
-        new_state.player = 0 if self.player == 1 else 1
+        new_state.player = NimLogic.other_player(self.player)
 
         if all(pile == 0 for pile in new_state.piles):
             new_state.winner = new_state.player

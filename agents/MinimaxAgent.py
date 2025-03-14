@@ -2,7 +2,6 @@ from nim.NimLogic import NimLogic
 
 
 class MinimaxAgent:
-
     def __init__(self, max_depth=None):
         self.max_depth = max_depth
 

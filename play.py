@@ -1,14 +1,11 @@
 from nim.Nim import *
 
-from agents.QLearningAgent import QLearningAgent
-from agents.AlphaZeroAgent import AlphaZeroAgent
 from agents.MinimaxAgent import MinimaxAgent
-from agents.A3CAgent import A3CAgent
-from agents.LLMAgent import LLMAgent
+from agents.MinimaxNimAgent import MinimaxNimAgent
 
 import random
 
-AGENT = LLMAgent
+AGENT = MinimaxNimAgent
 
 
 if __name__ == '__main__':
@@ -17,7 +14,7 @@ if __name__ == '__main__':
     ai_player = AGENT()
     ai_player.train()
 
-    game = Nim()
+    game = Nim(initial=[10, 10, 10, 10])
 
     while True:
         print()
