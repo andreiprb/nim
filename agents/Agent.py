@@ -3,4 +3,8 @@ class Agent:
         self.name = name + " agent"
 
     def train(self):
-        print(self.name + " training...")
+        if "minimax" in self.name:
+            print(f"Playing {self.name}. No need for training.")
+            return
+
+        print(f"Training {self.name} agent...")

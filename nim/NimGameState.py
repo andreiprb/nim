@@ -2,7 +2,7 @@ from nim.NimLogic import NimLogic
 
 
 class NimGameState:
-    def __init__(self, initial=[1, 3, 5, 7]):
+    def __init__(self, initial):
         self.piles = initial.copy()
         self.player = 0
         self.winner = None
