@@ -9,7 +9,7 @@ class MinimaxAgent(Agent):
         self.max_depth = max_depth
 
     def choose_action(self, state):
-        value, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
+        _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
         return best_action
 
     def _minimax(self, state, player, alpha, beta, depth):
