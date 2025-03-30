@@ -1,11 +1,10 @@
 from nim.Nim import *
 
 from agents.MinimaxAgent import MinimaxAgent
-from agents.MinimaxNimAgent import MinimaxNimAgent
 
 import random
 
-AGENT = MinimaxNimAgent
+AGENT = MinimaxAgent
 
 
 if __name__ == '__main__':
@@ -45,7 +44,7 @@ if __name__ == '__main__':
 
         else:
             print("AI's Turn")
-            pile, count = ai_player.choose_action(game.piles, epsilon=False)
+            pile, count = ai_player.choose_action(game.piles)
             print(f"AI chose to take {count} from pile {pile}.")
 
         game.move((pile, count))
