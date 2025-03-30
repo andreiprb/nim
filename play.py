@@ -1,11 +1,12 @@
+import random
+
 from nim.Nim import *
 
 from agents.NimAgent import NimAgent
+from agents.MinimaxAgent import MinimaxAgent
+from agents.MinimaxNimAgent import MinimaxNimAgent
 
-import random
-
-AGENT = NimAgent
-
+AGENT = MinimaxAgent
 
 if __name__ == '__main__':
     human_player = random.randint(0, 1)
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     ai_player = AGENT()
     ai_player.train()
 
-    game = Nim(initial=[100, 100, 100])
+    game = Nim(initial=[100, 100, 100, 100, 100, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
 
     while True:
         print()
@@ -24,6 +25,7 @@ if __name__ == '__main__':
 
         available_actions = NimLogic.available_actions(game.piles)
 
+
         def get_int(prompt):
             while True:
                 user_input = input(prompt)
@@ -31,6 +33,7 @@ if __name__ == '__main__':
                     return int(user_input)
                 except ValueError:
                     continue
+
 
         if game.player == human_player:
             print("Your Turn")

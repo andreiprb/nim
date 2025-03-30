@@ -7,6 +7,7 @@ class MinimaxAgent(Agent):
     def __init__(self, max_depth=100):
         super().__init__("Minimax")
         self.max_depth = min(max_depth, 1)
+        self.default = 100
 
     def choose_action(self, state):
         _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
@@ -14,10 +15,11 @@ class MinimaxAgent(Agent):
 
     def _minimax(self, state, player, alpha, beta, depth):
         if all(pile == 0 for pile in state):
-            return (1 if player == 0 else -1), None
+            return (self.default - depth if player == 0 else depth - self.default), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            return sum(state) * (-1 if player == 1 else 1), None
+            heuristic_score = NimLogic.heuristic_evaluation(state, player)
+            return heuristic_score, None
 
         actions = NimLogic.available_actions(state)
         best_action = None
