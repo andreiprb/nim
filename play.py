@@ -24,7 +24,6 @@ if __name__ == '__main__':
 
         available_actions = NimLogic.available_actions(game.piles)
 
-
         def get_int(prompt):
             while True:
                 user_input = input(prompt)
