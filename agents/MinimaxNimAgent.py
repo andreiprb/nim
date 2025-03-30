@@ -5,7 +5,7 @@ from agents.Agent import Agent
 
 class MinimaxNimAgent(Agent):
     def __init__(self, max_depth=100):
-        super().__init__("Optimized minimax")
+        super().__init__("Nim-optimized minimax")
         self.max_depth = min(max_depth, 1)
         self.default = 100
 
