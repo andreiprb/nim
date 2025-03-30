@@ -10,10 +10,10 @@ AGENT = MinimaxNimAgent
 if __name__ == '__main__':
     human_player = random.randint(0, 1)
 
-    ai_player = AGENT()
+    ai_player = AGENT(max_depth=1)
     ai_player.train()
 
-    game = Nim(initial=[5, 5, 5, 5])
+    game = Nim(initial=[100, 100, 100])
 
     while True:
         print()

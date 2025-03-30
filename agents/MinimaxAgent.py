@@ -4,9 +4,9 @@ from agents.Agent import Agent
 
 
 class MinimaxAgent(Agent):
-    def __init__(self, max_depth=None):
+    def __init__(self, max_depth=100):
         super().__init__("Minimax")
-        self.max_depth = max_depth
+        self.max_depth = min(max_depth, 1)
 
     def choose_action(self, state):
         _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
