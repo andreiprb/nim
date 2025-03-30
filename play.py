@@ -1,10 +1,10 @@
 from nim.Nim import *
 
-from agents.MinimaxAgent import MinimaxAgent
+from agents.MinimaxNimAgent import MinimaxNimAgent
 
 import random
 
-AGENT = MinimaxAgent
+AGENT = MinimaxNimAgent
 
 
 if __name__ == '__main__':
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     ai_player = AGENT()
     ai_player.train()
 
-    game = Nim(initial=[10, 10, 10, 10])
+    game = Nim(initial=[5, 5, 5, 5])
 
     while True:
         print()
