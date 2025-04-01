@@ -6,9 +6,7 @@ from agents.NimAgent import NimAgent
 from agents.MinimaxAgent import MinimaxAgent
 from agents.MinimaxNimAgent import MinimaxNimAgent
 
-from agents.AlphaZeroAttentionAgent import AlphaZeroAttentionAgent
-
-AGENT = AlphaZeroAttentionAgent
+AGENT = MinimaxAgent
 
 if __name__ == '__main__':
     human_player = random.randint(0, 1)
