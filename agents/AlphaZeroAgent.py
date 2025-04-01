@@ -1,66 +1,14 @@
 from nim.NimLogic import NimLogic
 
+from agents.Agent import Agent
+
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math, os
 
-
-class AlphaZeroNet(nn.Module):
-    def __init__(self, num_piles=4, max_pile_size=7, history_length=1):
-        super(AlphaZeroNet, self).__init__()
-        self.num_piles = num_piles
-        self.max_pile_size = max_pile_size
-        self.history_length = history_length
-
-        # Input size now includes current state + previous states
-        self.state_size = num_piles * (max_pile_size + 1)
-        input_size = self.state_size * (history_length + 1)  # +1 for current state
-
-        self.shared = nn.Sequential(
-            nn.Linear(input_size, 128),
-            nn.ReLU(),
-            nn.Linear(128, 64),
-            nn.ReLU()
-        )
-
-        self.policy_head = nn.Linear(64, num_piles * max_pile_size)
-
-        self.value_head = nn.Sequential(
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, 1),
-            nn.Tanh()
-        )
-
-    def forward(self, x):
-        x = self.shared(x)
-        policy = self.policy_head(x)
-        value = self.value_head(x)
-        return F.softmax(policy, dim=1), value
-
-    def encode_state(self, state, history=None):
-        # Encode current state
-        encoded = torch.zeros(1, self.state_size * (self.history_length + 1))
-
-        # Fill in current state
-        for i, pile in enumerate(state):
-            if pile <= self.max_pile_size:
-                encoded[0, i * (self.max_pile_size + 1) + pile] = 1
-
-        # Fill in history states if available
-        if history is not None:
-            for h_idx, h_state in enumerate(history):
-                if h_idx >= self.history_length:
-                    break
-                offset = self.state_size * (h_idx + 1)
-                for i, pile in enumerate(h_state):
-                    if pile <= self.max_pile_size:
-                        encoded[0, offset + i * (self.max_pile_size + 1) + pile] = 1
-
-        return encoded
-
+from svm.svm2 import HybridAlphaZeroNet
 
 class MCTSNode:
     def __init__(self, state, history=None, prior=0, parent=None):
@@ -147,11 +95,14 @@ class MCTS:
         return all(pile == 0 for pile in state)
 
 
-class AlphaZeroAgent:
-    def __init__(self, num_piles=4, max_pile_size=7, history_length=1):
-        self.model = AlphaZeroNet(num_piles, max_pile_size, history_length)
+class HybridAlphaZeroAgent(Agent):
+    def __init__(self, num_piles=21, max_pile_size=100, history_length=1):
+        super().__init__("HybridAlphaZero")
+        self.svc_model = self._create_svc_model()
+        policy_output_dim = num_piles * max_pile_size
+        self.model = HybridAlphaZeroNet(self.svc_model, policy_output_dim, num_piles, max_pile_size, history_length)
         self.mcts = MCTS(self.model)
-        self.save_path = "savedAgents/alphazero_with_history.pth"
+        self.save_path = "savedAgents/hybrid_alphazero.pth"
         self.game_history = []
 
         os.makedirs("savedAgents", exist_ok=True)
@@ -159,7 +110,28 @@ class AlphaZeroAgent:
         if os.path.exists(self.save_path):
             self.load_model()
 
+    def _create_svc_model(self):
+        states = []
+        labels = []
+
+        # Generate some training data with nim-sum patterns
+        for _ in range(1000):
+            # Generate random piles (simple case for training)
+            piles = [np.random.randint(0, 5) for _ in range(4)]
+            states.append(piles)
+
+            # Calculate nim-sum
+            nim_sum = NimLogic.nim_sum(piles)
+            labels.append(1 if nim_sum == 0 else 0)  # P-position (1) if nim-sum is 0, else N-position (0)
+
+        # Train SVC model
+        svc = SVC(kernel='linear')
+        svc.fit(states, labels)
+
+        return svc
+
     def save_model(self):
+        # Save only the neural network part, not the SVC
         torch.save(self.model.state_dict(), self.save_path)
         print(f"Model saved to {self.save_path}")
 
@@ -187,9 +159,10 @@ class AlphaZeroAgent:
 
     def train(self, num_episodes=1000, batch_size=32):
         if os.path.exists(self.save_path):
+            print(f"Model already exists at {self.save_path}. Skipping training.")
             return
 
-        print(f"Training AlphaZero agent with history for {num_episodes} episodes...")
+        print(f"Training Hybrid AlphaZero agent for {num_episodes} episodes...")
 
         optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
 
@@ -250,14 +223,20 @@ class AlphaZeroAgent:
             visit_counts = np.zeros(self.model.num_piles * self.model.max_pile_size)
             for action, child in root.children.items():
                 action_idx = action[0] * self.model.max_pile_size + (action[1] - 1)
-                visit_counts[action_idx] = child.visit_count
+                if action_idx < len(visit_counts):  # Ensure index is within bounds
+                    visit_counts[action_idx] = child.visit_count
 
-            policy = visit_counts / (visit_counts.sum() or 1)  # Avoid division by zero
+            # Avoid division by zero
+            total_visits = visit_counts.sum()
+            if total_visits > 0:
+                policy = visit_counts / total_visits
+            else:
+                policy = np.ones_like(visit_counts) / len(visit_counts)
 
             # Store training examples
             states.append(current_state)
             histories.append(game_history.copy())  # Make a copy to preserve the history at this point
-            policies.append(torch.tensor(policy))
+            policies.append(torch.tensor(policy, dtype=torch.float32))
 
             # Choose the most visited action
             action = max(root.children.items(), key=lambda x: x[1].visit_count)[0]

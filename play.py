@@ -6,7 +6,9 @@ from agents.NimAgent import NimAgent
 from agents.MinimaxAgent import MinimaxAgent
 from agents.MinimaxNimAgent import MinimaxNimAgent
 
-AGENT = MinimaxAgent
+from agents.AlphaZeroAttentionAgent import AlphaZeroAttentionAgent
+
+AGENT = AlphaZeroAttentionAgent
 
 if __name__ == '__main__':
     human_player = random.randint(0, 1)
@@ -14,7 +16,7 @@ if __name__ == '__main__':
     ai_player = AGENT()
     ai_player.train()
 
-    game = Nim(initial=[100, 100, 100, 100, 100, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
+    game = Nim(initial=[0, 1, 2, 3, 4, 5, 6, 7])
 
     while True:
         print()
