@@ -1,20 +1,27 @@
 from nim.NimLogic import NimLogic
 from nim.NimGameState import NimGameState
 
+from agents.Agent import Agent
+
 import random, json, os
 
 
-class QLearningAgent:
-    def __init__(self, alpha=0.5, epsilon=0.1):
+class QLearningAgent(Agent):
+    def __init__(self, initial, alpha=0.5, epsilon=0.1):
+        super().__init__("QLearningAgent")
         self.q = dict()
         self.alpha = alpha
         self.epsilon = epsilon
-        self.save_path = "savedAgents/qlearning.json"
+        self.save_path = f"savedAgents/qlearning-{'-'.join(str(p) for p in initial)}.json"
+        self.initial_piles = initial
 
         os.makedirs("savedAgents", exist_ok=True)
 
         if os.path.exists(self.save_path):
             self.load_q_values()
+
+        else:
+            self.train()
 
     def save_q_values(self):
         serializable_q = {}
@@ -24,9 +31,9 @@ class QLearningAgent:
             key = f"{state_str}|{action_str}"
             serializable_q[key] = value
 
-        # with open(self.save_path, 'w') as f:
-        #     json.dump(serializable_q, f)
-        # print(f"Q-values saved to {self.save_path}")
+        with open(self.save_path, 'w') as f:
+            json.dump(serializable_q, f)
+        print(f"Q-values saved to {self.save_path}")
 
     def load_q_values(self):
         try:
@@ -83,14 +90,14 @@ class QLearningAgent:
 
         return best[1]
 
-    def train(self, num_episodes=50000):
+    def train(self, num_episodes=10000):
         if os.path.exists(self.save_path):
             return
 
         print(f"Training Q-Learning agent for {num_episodes} episodes...")
 
         for i in range(num_episodes):
-            state = NimGameState()
+            state = NimGameState(self.initial_piles)
 
             last = {
                 0: {"state": None, "action": None},

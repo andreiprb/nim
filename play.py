@@ -1,60 +1,63 @@
-import random
-
 from nim.Nim import *
+from nim.NimLogic import NimLogic
 
-from agents.NimAgent import NimAgent
+from agents.HumanAgent import HumanAgent
+
 from agents.MinimaxAgent import MinimaxAgent
 from agents.MinimaxNimAgent import MinimaxNimAgent
 
-AGENT = MinimaxAgent
+from agents.QLearningAgent import QLearningAgent
 
-if __name__ == '__main__':
-    human_player = random.randint(0, 1)
 
-    ai_player = AGENT()
-    ai_player.train()
-
-    game = Nim(initial=[0, 1, 2, 3, 4, 5, 6, 7])
+def play_game(player1, player2, initial_piles, verbose=True):
+    game = Nim(initial=initial_piles)
+    players = [player1, player2]
+    player_names = ["Player 1", "Player 2"]
 
     while True:
-        print()
-        print("Piles:")
-        for i, pile in enumerate(game.piles):
-            print(f"Pile {i}: {pile}")
-        print()
+        if verbose:
+            print()
+            print("Piles:")
+            for i, pile in enumerate(game.piles):
+                print(f"Pile {i}: {pile}")
+            print()
 
-        available_actions = NimLogic.available_actions(game.piles)
+        current_player = players[game.player]
+        if verbose:
+            print(f"{player_names[game.player]}'s Turn ({current_player.name})")
 
-
-        def get_int(prompt):
-            while True:
-                user_input = input(prompt)
-                try:
-                    return int(user_input)
-                except ValueError:
-                    continue
-
-
-        if game.player == human_player:
-            print("Your Turn")
-            while True:
-                pile = get_int("Choose Pile: ")
-                count = get_int("Choose Count: ")
-                if (pile, count) in available_actions:
-                    break
-                print("Invalid move, try again.")
-
-        else:
-            print("AI's Turn")
-            pile, count = ai_player.choose_action(game.piles)
-            print(f"AI chose to take {count} from pile {pile}.")
+        pile, count = current_player.choose_action(game.piles)
+        if verbose:
+            print(f"{player_names[game.player]} chose to take {count} from pile {pile}.")
 
         game.move((pile, count))
 
         if game.winner is not None:
-            print()
-            print("GAME OVER")
-            winner = "Human" if game.winner == human_player else "AI"
-            print(f"Winner is {winner}")
-
+            if verbose:
+                print()
+                print("GAME OVER")
+                print(f"Winner is {player_names[game.winner]} ({players[game.winner].name})")
             break
+
+    return game.winner
+
+
+if __name__ == '__main__':
+    initial_piles = [5, 6, 7, 8, 9, 10]
+
+    player1 = QLearningAgent(initial_piles)
+    player2 = MinimaxNimAgent()
+
+    player1wins = 0
+    player2wins = 0
+
+    for _ in range(10000):
+        winner = play_game(player1, player2, initial_piles, False)
+
+        if winner:
+            player2wins += 1
+
+        else:
+            player1wins += 1
+
+    print(player1wins, '-', player2wins)

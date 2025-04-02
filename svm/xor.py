@@ -7,15 +7,17 @@ from sklearn.metrics import accuracy_score
 # import torch.nn as nn
 # import torch.optim as optim
 
-TOKEN_LEN, TOKEN_CNT = 3, 200
+TOKEN_LEN, TOKEN_CNT = 3, 5
 
 """******************************************************************************"""
 
 tokens = np.array(list(itertools.product([0, 1], repeat=TOKEN_LEN)))
-t1 = np.repeat(tokens, 2, axis=0)
-t2 = np.tile(tokens, (2, 1))
+pairs = np.array(list(itertools.product(tokens, tokens)))
 
-X_train = np.stack((t1, t2), axis=1).reshape((-1, 2 * TOKEN_LEN))
+t1 = np.array([p[0] for p in pairs])
+t2 = np.array([p[1] for p in pairs])
+
+X_train = np.hstack((t1, t2))
 
 y_train_ext = np.bitwise_xor(t1, t2)
 y_train = (np.sum(y_train_ext, axis=1) > 0).astype(int)
@@ -24,6 +26,9 @@ svc_model = SVC(kernel='rbf', gamma=2.0)
 svc_model.fit(X_train, y_train)
 
 svc_preds = svc_model.predict(X_train)
+
+print(y_train, svc_preds)
+
 print("SVC accuracy", accuracy_score(svc_preds, y_train))
 
 """******************************************************************************"""
@@ -31,19 +36,18 @@ print("SVC accuracy", accuracy_score(svc_preds, y_train))
 rng = np.random.default_rng(seed=42)
 sequence = tokens[rng.integers(0, len(tokens), size=TOKEN_CNT)]
 
-for i in range(0, TOKEN_CNT):
-    print(sequence[i])
+state = sequence[0]
 
-state = np.zeros(TOKEN_LEN, dtype=int)
-
-for i in range(0, TOKEN_CNT):
-    current_input = sequence[i]
-    x_input = np.concatenate([state, current_input]).reshape(1, -1)
+for i in range(1, TOKEN_CNT):
+    next_state = sequence[i]
+    x_input = np.concatenate([state, next_state]).reshape(1, -1)
     prediction = svc_model.predict(x_input)[0]
 
-    state = np.bitwise_xor(state, current_input)
+    new_state = np.bitwise_xor(state, next_state)
 
-    print(prediction, state)
+    print(state, next_state, "->", new_state, prediction)
+
+    state = new_state
 
 
 # X_tensor = torch.tensor(X_train, dtype=torch.float32)

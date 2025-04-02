@@ -3,7 +3,7 @@ from nim.NimLogic import NimLogic
 
 
 class Nim:
-    def __init__(self, initial=[1, 3, 5, 7]):
+    def __init__(self, initial):
         self.state = NimGameState(initial)
 
     @property
