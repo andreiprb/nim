@@ -33,7 +33,7 @@ class NimLogic(object):
         greater_piles = sum(1 for pile in state if pile > 1)
 
         if greater_piles == 0:
-            if (one_piles % 2 == 0 and misere) or (one_piles % 2 == 1 and not misere):
+            if (one_piles % 2 == 0 and state) or (one_piles % 2 == 1 and not state):
                 score = 50
             else:
                 score = -50

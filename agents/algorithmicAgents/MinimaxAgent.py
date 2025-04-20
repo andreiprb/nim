@@ -4,9 +4,10 @@ from agents.Agent import Agent
 
 
 class MinimaxAgent(Agent):
-    def __init__(self, max_depth=100):
+    def __init__(self, misere, max_depth):
         super().__init__("Minimax")
-        self.max_depth = min(max_depth, 1)
+        self.misere = misere
+        self.max_depth = max(max_depth, 1)
         self.default = 100
 
     def choose_action(self, state):
@@ -15,10 +16,11 @@ class MinimaxAgent(Agent):
 
     def _minimax(self, state, player, alpha, beta, depth):
         if all(pile == 0 for pile in state):
-            return (self.default - depth if player == 0 else depth - self.default), None
+            sign = 1 if player == self.misere else -1
+            return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            heuristic_score = NimLogic.heuristic_evaluation(state, player)
+            heuristic_score = NimLogic.heuristic_evaluation(state, player, self.misere)
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)

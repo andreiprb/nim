@@ -10,7 +10,8 @@ def play(player1, player2, initial_piles, misere, verbose=True):
 
     while True:
         if verbose:
-            print("\nPiles:")
+            print("\nPlaying misere Nim!" if game.is_misere else "\nPlaying normal Nim!")
+            print("Piles:")
             for i, pile in enumerate(game.piles):
                 print(f"Pile {i}: {pile}")
             print()
