@@ -7,13 +7,13 @@ import random, json, os
 
 
 class QLearningAgent(Agent):
-    def __init__(self, initial, alpha=0.5, epsilon=0.1):
+    def __init__(self, initial_piles, alpha=0.5, epsilon=0.1):
         super().__init__("QLearningAgent")
         self.q = dict()
         self.alpha = alpha
         self.epsilon = epsilon
-        self.save_path = f"savedAgents/qlearning-{'-'.join(str(p) for p in initial)}.json"
-        self.initial_piles = initial
+        self.save_path = f"savedAgents/qlearning-{'-'.join(str(p) for p in initial_piles)}.json"
+        self.initial_piles = initial_piles
 
         os.makedirs("savedAgents", exist_ok=True)
 

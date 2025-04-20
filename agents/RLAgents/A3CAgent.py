@@ -10,7 +10,7 @@ from nim.NimGameState import NimGameState
 
 
 class A3CNet(nn.Module):
-    def __init__(self, num_piles=4, max_pile_size=7):
+    def __init__(self, num_piles, max_pile_size):
         super(A3CNet, self).__init__()
         self.num_piles = num_piles
         self.max_pile_size = max_pile_size
@@ -47,12 +47,12 @@ class A3CNet(nn.Module):
 
 
 class Worker(mp.Process):
-    def __init__(self, global_model, optimizer, worker_id, num_episodes):
+    def __init__(self, global_model, optimizer, worker_id, num_episodes, num_piles, max_pile_size):
         super(Worker, self).__init__()
         self.worker_id = worker_id
         self.num_episodes = num_episodes
 
-        self.local_model = A3CNet()
+        self.local_model = A3CNet(num_piles, max_pile_size)
         self.local_model.load_state_dict(global_model.state_dict())
 
         self.optimizer = optimizer
@@ -200,8 +200,8 @@ class Worker(mp.Process):
 
 
 class A3CAgent:
-    def __init__(self, num_piles=4, max_pile_size=7, num_workers=10):
-        self.model = A3CNet(num_piles, max_pile_size)
+    def __init__(self, initial_piles, num_workers=10):
+        self.model = A3CNet(len(initial_piles), max(initial_piles))
         self.model.share_memory()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
         self.num_workers = num_workers
@@ -262,7 +262,14 @@ class A3CAgent:
 
         workers = []
         for i in range(self.num_workers):
-            worker = Worker(self.model, self.optimizer, i, num_episodes // self.num_workers)
+            worker = Worker(
+                self.model,
+                self.optimizer,
+                i,
+                num_episodes // self.num_workers,
+                len(self.model.num_piles),
+                self.model.max_pile_size
+            )
             workers.append(worker)
             worker.start()
 
