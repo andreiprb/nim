@@ -2,13 +2,14 @@ from nim.NimLogic import NimLogic
 
 
 class NimGameState:
-    def __init__(self, initial):
+    def __init__(self, initial, misere):
         self.piles = initial.copy()
         self.player = 0
         self.winner = None
+        self.misere = misere
 
     def copy(self):
-        new_state = NimGameState(self.piles)
+        new_state = NimGameState(self.piles, self.misere)
         new_state.player = self.player
         new_state.winner = self.winner
         return new_state
@@ -28,6 +29,9 @@ class NimGameState:
         new_state.player = NimLogic.other_player(self.player)
 
         if all(pile == 0 for pile in new_state.piles):
-            new_state.winner = new_state.player
+            if new_state.misere:
+                new_state.winner = new_state.player
+            else:
+                new_state.winner = NimLogic.other_player(new_state.player)
 
         return new_state

@@ -1,10 +1,9 @@
 from nim.NimGameState import NimGameState
-from nim.NimLogic import NimLogic
 
 
 class Nim:
-    def __init__(self, initial, misere):
-        self.state = NimGameState(initial)
+    def __init__(self, initial, misere=True):
+        self.state = NimGameState(initial, misere)
         self.misere = misere
 
     @property
@@ -17,10 +16,11 @@ class Nim:
 
     @property
     def winner(self):
-        if not self.misere:
-            return NimLogic.other_player(self.state.winner)
-
         return self.state.winner
+
+    @property
+    def is_misere(self):
+        return self.misere
 
     def move(self, action):
         self.state = self.state.apply_move(action)
