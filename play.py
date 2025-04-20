@@ -1,19 +1,16 @@
 from nim.Nim import *
-from nim.NimLogic import NimLogic
 
-from agents.algorithmicAgents.MinimaxAgent import MinimaxAgent
-from agents.algorithmicAgents.MinimaxNimAgent import MinimaxNimAgent
+from agents.otherAgents.HumanAgent import HumanAgent
 
 
-def play_game(p1, p2, piles, misere, verbose=True):
-    game = Nim(initial=piles, misere=misere)
-    players = [p1, p2]
+def play(player1, player2, initial_piles, misere, verbose=True):
+    game = Nim(initial=initial_piles, misere=misere)
+    players = [player1, player2]
     player_names = ["Player 1", "Player 2"]
 
     while True:
         if verbose:
-            print()
-            print("Piles:")
+            print("\nPiles:")
             for i, pile in enumerate(game.piles):
                 print(f"Pile {i}: {pile}")
             print()
@@ -30,9 +27,7 @@ def play_game(p1, p2, piles, misere, verbose=True):
 
         if game.winner is not None:
             if verbose:
-                print()
-                print("GAME OVER")
-                print(f"Winner is {player_names[game.winner]} ({players[game.winner].name})")
+                print(f"\nGAME OVER\nWinner is {player_names[game.winner]} ({players[game.winner].name})")
             break
 
     return game.winner
@@ -41,20 +36,15 @@ def play_game(p1, p2, piles, misere, verbose=True):
 if __name__ == '__main__':
     initial_piles = [5, 6, 7, 8, 9, 10]
 
-    player1 = MinimaxAgent()
-    player2 = MinimaxNimAgent()
+    player1 = HumanAgent()
+    player2 = HumanAgent()
 
-    wins = [0, 0]
+    misere = False
 
-    for _ in range(10000):
-        winner = play_game(
-            p1=player1,
-            p2=player2,
-            piles=initial_piles,
-            misere=False,
-            verbose=False
-        )
-
-        wins[winner] += 1
-
-    print(f"{wins[0]} - {wins[1]}")
+    play(
+        player1=player1,
+        player2=player2,
+        initial_piles=initial_piles,
+        misere=misere,
+        verbose=True
+    )

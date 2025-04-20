@@ -6,6 +6,8 @@ class Nim:
         self.state = NimGameState(initial, misere)
         self.misere = misere
 
+        print("Playing misere Nim!" if self.misere else "Playing normal Nim!")
+
     @property
     def piles(self):
         return self.state.piles
