@@ -5,9 +5,9 @@ from agents.algorithmicAgents.MinimaxAgent import MinimaxAgent
 from agents.algorithmicAgents.MinimaxNimAgent import MinimaxNimAgent
 
 
-def play_game(player1, player2, initial_piles, verbose=True):
-    game = Nim(initial=initial_piles)
-    players = [player1, player2]
+def play_game(p1, p2, piles, misere, verbose=True):
+    game = Nim(initial=piles, misere=misere)
+    players = [p1, p2]
     player_names = ["Player 1", "Player 2"]
 
     while True:
@@ -44,16 +44,17 @@ if __name__ == '__main__':
     player1 = MinimaxAgent()
     player2 = MinimaxNimAgent()
 
-    player1wins = 0
-    player2wins = 0
+    wins = [0, 0]
 
     for _ in range(10000):
-        winner = play_game(player1, player2, initial_piles, False)
+        winner = play_game(
+            p1=player1,
+            p2=player2,
+            piles=initial_piles,
+            misere=False,
+            verbose=False
+        )
 
-        if winner:
-            player2wins += 1
+        wins[winner] += 1
 
-        else:
-            player1wins += 1
-
-    print(player1wins, '-', player2wins)
+    print(f"{wins[0]} - {wins[1]}")

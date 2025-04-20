@@ -3,8 +3,9 @@ from nim.NimLogic import NimLogic
 
 
 class Nim:
-    def __init__(self, initial):
+    def __init__(self, initial, misere):
         self.state = NimGameState(initial)
+        self.misere = misere
 
     @property
     def piles(self):
@@ -16,6 +17,9 @@ class Nim:
 
     @property
     def winner(self):
+        if not self.misere:
+            return NimLogic.other_player(self.state.winner)
+
         return self.state.winner
 
     def move(self, action):
