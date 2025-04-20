@@ -1,19 +1,19 @@
-from nim.NimLogic import NimLogic
-from nim.NimGameState import NimGameState
+import random, json, os
 
 from agents.Agent import Agent
 
-import random, json, os
+from nim.NimLogic import NimLogic
+from nim.NimGameState import NimGameState
 
 
 class QLearningAgent(Agent):
-    def __init__(self, initial_piles, alpha=0.5, epsilon=0.1):
+    def __init__(self, initial, alpha=0.5, epsilon=0.1):
         super().__init__("QLearningAgent")
         self.q = dict()
         self.alpha = alpha
         self.epsilon = epsilon
-        self.save_path = f"savedAgents/qlearning-{'-'.join(str(p) for p in initial_piles)}.json"
-        self.initial_piles = initial_piles
+        self.save_path = f"savedAgents/qlearning-{'-'.join(str(p) for p in initial)}.json"
+        self.initial_piles = initial
 
         os.makedirs("savedAgents", exist_ok=True)
 
@@ -71,7 +71,7 @@ class QLearningAgent(Agent):
 
         return best
 
-    def choose_action(self, state, epsilon=True):
+    def choose_action(self, state):
         best = (0, 0)
 
         actions = NimLogic.available_actions(state)
@@ -85,7 +85,7 @@ class QLearningAgent(Agent):
         if best[0] == 0:
             return random.choice(tuple(actions))
 
-        if epsilon and random.random() < self.epsilon:
+        if random.random() < self.epsilon:
             return random.choice(tuple(actions))
 
         return best[1]

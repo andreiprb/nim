@@ -1,12 +1,8 @@
 from nim.Nim import *
 from nim.NimLogic import NimLogic
 
-from agents.HumanAgent import HumanAgent
-
-from agents.MinimaxAgent import MinimaxAgent
-from agents.MinimaxNimAgent import MinimaxNimAgent
-
-from agents.QLearningAgent import QLearningAgent
+from agents.algorithmicAgents.MinimaxAgent import MinimaxAgent
+from agents.algorithmicAgents.MinimaxNimAgent import MinimaxNimAgent
 
 
 def play_game(player1, player2, initial_piles, verbose=True):
@@ -45,7 +41,7 @@ def play_game(player1, player2, initial_piles, verbose=True):
 if __name__ == '__main__':
     initial_piles = [5, 6, 7, 8, 9, 10]
 
-    player1 = QLearningAgent(initial_piles)
+    player1 = MinimaxAgent()
     player2 = MinimaxNimAgent()
 
     player1wins = 0

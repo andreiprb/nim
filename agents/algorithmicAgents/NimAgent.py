@@ -7,7 +7,7 @@ class NimAgent(Agent):
     def __init__(self):
         super().__init__("Nim")
 
-    def choose_action(self, piles, epsilon=False):
+    def choose_action(self, piles):
         nim_sum = NimLogic.nim_sum(piles)
         available_actions = NimLogic.available_actions(piles)
 
@@ -33,3 +33,5 @@ class NimAgent(Agent):
             for i, pile in enumerate(piles):
                 if pile == 1:
                     return i, 1
+                return None
+            return None
