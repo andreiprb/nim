@@ -3,7 +3,7 @@ from nim.NimLogic import NimLogic
 from agents.Agent import Agent
 
 
-class MinimaxNimAgent(Agent):
+class OptimizedMinimaxAgent(Agent):
     def __init__(self, max_depth=100):
         super().__init__("Nim-optimized minimax")
         self.max_depth = min(max_depth, 1)
