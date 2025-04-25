@@ -1,18 +1,12 @@
 from nim.NimLogic import NimLogic
 
-from agents.Agent import Agent
+from agents.Minimax.MinimaxAgentV1 import MinimaxAgentV1
 
 
-class MinimaxAgentV2(Agent):
+class MinimaxAgentV2(MinimaxAgentV1):
     def __init__(self, misere, max_depth):
-        super().__init__("MinimaxV2")
-        self.misere = misere
-        self.max_depth = max(max_depth, 1)
-        self.default = self.max_depth
-
-    def choose_action(self, state):
-        _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
-        return best_action
+        super().__init__(misere, max_depth)
+        self.name = "MinimaxV2"
 
     def _minimax(self, state, player, alpha, beta, depth):
         if all(pile == 0 for pile in state):
@@ -27,7 +21,6 @@ class MinimaxAgentV2(Agent):
         actions = sorted(actions, key=lambda a: a[1], reverse=True)
 
         best_action = None
-
         is_endgame = all(pile <= 1 for pile in state)
 
         if player == 0:
