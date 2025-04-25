@@ -9,16 +9,18 @@ class MinimaxAgentV2(MinimaxAgentV1):
         self.name = "MinimaxV2"
 
     def _minimax(self, state, player, alpha, beta, depth):
+        self.nodes_explored += 1
+
         if all(pile == 0 for pile in state):
             sign = 1 if player == self.misere else -1
             return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            heuristic_score = NimLogic.heuristic_evaluation(state, player)
+            heuristic_score = NimLogic.heuristic_evaluation(state, player, self.misere)
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)
-        actions = sorted(actions, key=lambda a: a[1], reverse=True)
+        # actions = sorted(actions, key=lambda a: a[1], reverse=True)
 
         best_action = None
         is_endgame = all(pile <= 1 for pile in state)

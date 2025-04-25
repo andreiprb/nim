@@ -10,17 +10,28 @@ class MinimaxAgentV1(Agent):
         self.max_depth = max(max_depth, 1)
         self.default = self.max_depth
 
+        self.nodes_explored = 0
+        self.moves_count = 0
+        self.mean_nodes = 0
+
     def choose_action(self, state):
+        self.moves_count += 1
+
         _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
+
+        self.mean_nodes = self.nodes_explored / self.moves_count
+
         return best_action
 
     def _minimax(self, state, player, alpha, beta, depth):
+        self.nodes_explored += 1
+
         if all(pile == 0 for pile in state):
             sign = 1 if player == self.misere else -1
             return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            heuristic_score = NimLogic.heuristic_evaluation(state, player)
+            heuristic_score = NimLogic.heuristic_evaluation(state, player, self.misere)
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)

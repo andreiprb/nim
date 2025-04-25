@@ -1,5 +1,7 @@
 from nim.NimGameState import NimGameState
 
+from agents.Minimax.MinimaxAgentV1 import MinimaxAgentV1
+
 
 class Nim:
     def __init__(self, initial_piles, misere=True):
@@ -28,6 +30,8 @@ class Nim:
     def play(self, player1, player2, verbose=True):
         players = [player1, player2]
 
+        mean_nodes = 0
+
         if verbose:
             print(f"{'Misere' if self.misere else 'Normal'} game")
 
@@ -47,6 +51,14 @@ class Nim:
 
             if self.winner is not None:
                 if verbose:
-                    print(f"Player {int(self.winner) + 1} ({players[self.winner].name}) wins!")
+                    print(f"Player {int(self.winner) + 1} ({players[self.winner].name}) wins!\n")
 
-        return self.winner
+            for i, agent in enumerate(players):
+                if isinstance(agent, MinimaxAgentV1):
+                    if verbose:
+                        print(f"Agent {i + 1} ({agent.name}) NPM: {agent.mean_nodes:.2f}")
+
+                    else:
+                        mean_nodes = agent.mean_nodes
+
+        return self.winner, mean_nodes
