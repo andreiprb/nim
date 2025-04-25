@@ -3,9 +3,9 @@ from nim.NimLogic import NimLogic
 from agents.Agent import Agent
 
 
-class MinimaxAgent(Agent):
+class MinimaxAgentV1(Agent):
     def __init__(self, misere, max_depth):
-        super().__init__("Minimax")
+        super().__init__("MinimaxV1")
         self.misere = misere
         self.max_depth = max(max_depth, 1)
         self.default = self.max_depth

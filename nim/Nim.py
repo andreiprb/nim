@@ -29,10 +29,12 @@ class Nim:
         players = [player1, player2]
 
         if verbose:
-            print(f"Initial piles: {self.piles}")
             print(f"{'Misere' if self.misere else 'Normal'} game")
 
         while self.winner is None:
+            if verbose:
+                print(f"Piles: {self.piles}")
+
             current_player = self.player
             current_agent = players[current_player]
 
@@ -42,9 +44,6 @@ class Nim:
                 print(f"Player {int(current_player) + 1} ({current_agent.name}) takes {count} from pile {pile}")
 
             self.move((pile, count))
-
-            if verbose:
-                print(f"Piles: {self.piles}")
 
             if self.winner is not None:
                 if verbose:

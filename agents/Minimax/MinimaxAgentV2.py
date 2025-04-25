@@ -3,9 +3,9 @@ from nim.NimLogic import NimLogic
 from agents.Agent import Agent
 
 
-class OptimizedMinimaxAgent(Agent):
+class MinimaxAgentV2(Agent):
     def __init__(self, misere, max_depth):
-        super().__init__("Optimized minimax")
+        super().__init__("MinimaxV2")
         self.misere = misere
         self.max_depth = max(max_depth, 1)
         self.default = self.max_depth
@@ -28,14 +28,21 @@ class OptimizedMinimaxAgent(Agent):
 
         best_action = None
 
+        is_endgame = all(pile <= 1 for pile in state)
+
         if player == 0:
             value = float('-inf')
             for action in actions:
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
 
-                if NimLogic.p_or_n_position(new_state):
-                    return self.default - depth, action
+                is_p_position = NimLogic.p_or_n_position(new_state)
+
+                if is_p_position:
+                    if self.misere and is_endgame:
+                        return self.default - depth, action
+                    else:
+                        return depth - self.default, action
 
                 new_value, _ = self._minimax(new_state, 1, alpha, beta, depth + 1)
                 if new_value > value:
@@ -53,8 +60,13 @@ class OptimizedMinimaxAgent(Agent):
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
 
-                if NimLogic.p_or_n_position(new_state):
-                    return depth - self.default, action
+                is_p_position = NimLogic.p_or_n_position(new_state)
+
+                if is_p_position:
+                    if self.misere and is_endgame:
+                        return depth - self.default, action
+                    else:
+                        return self.default - depth, action
 
                 new_value, _ = self._minimax(new_state, 0, alpha, beta, depth + 1)
                 if new_value < value:
