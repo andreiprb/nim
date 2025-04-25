@@ -8,9 +8,9 @@ from nim.NimLogic import NimLogic
 from nim.NimGameState import NimGameState
 
 
-class QLearningAgentV1(Agent):
+class QLearningAgentV2(Agent):
     def __init__(self, misere, max_piles, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999):
-        super().__init__("Q-LearningV1")
+        super().__init__("Q-LearningV2")
         self.q = {}
         self.alpha = alpha
         self.epsilon = epsilon
@@ -19,7 +19,7 @@ class QLearningAgentV1(Agent):
         self.gamma = gamma
         self.max_piles = max_piles
         self.misere = misere
-        self.save_path = f"savedAgents/qlearningV1-{'-'.join(str(p) for p in max_piles)}-{misere}.json"
+        self.save_path = f"savedAgents/qlearningV2-{'-'.join(str(p) for p in max_piles)}-{misere}.json"
 
         os.makedirs("savedAgents", exist_ok=True)
 
@@ -54,42 +54,74 @@ class QLearningAgentV1(Agent):
             print(f"Error loading Q-values: {e}")
             self.q = {}
 
+    def normalize_state(self, state):
+        indexed_state = list(enumerate(state))
+        indexed_state.sort(key=lambda x: x[1])
+        original_indices = [i for i, _ in indexed_state]
+        sorted_state = tuple(val for _, val in indexed_state)
+        return sorted_state, original_indices
+
     def get_q_value(self, state, action):
-        return self.q.get((tuple(state), action), 0)
+        sorted_state, original_indices = self.normalize_state(state)
+        original_pile_idx, count = action
+        sorted_pile_idx = original_indices.index(original_pile_idx)
+        sorted_action = (sorted_pile_idx, count)
+        return self.q.get((sorted_state, sorted_action), 0)
 
     def update_q_value(self, state, action, reward, next_state):
-        old_q = self.get_q_value(state, action)
+        sorted_state, original_indices = self.normalize_state(state)
+        original_pile_idx, count = action
+        sorted_pile_idx = original_indices.index(original_pile_idx)
+        sorted_action = (sorted_pile_idx, count)
+
+        old_q = self.q.get((sorted_state, sorted_action), 0)
         max_future_q = self.best_future_reward(next_state)
         new_q = old_q + self.alpha * (reward + self.gamma * max_future_q - old_q)
-        self.q[(tuple(state), action)] = new_q
+
+        self.q[(sorted_state, sorted_action)] = new_q
 
     def best_future_reward(self, state):
-        actions = NimLogic.available_actions(state)
+        sorted_state, _ = self.normalize_state(state)
+
+        actions = set()
+        for sorted_idx, pile in enumerate(sorted_state):
+            actions.update((sorted_idx, j) for j in range(1, pile + 1))
+
         if not actions:
             return 0
 
-        return max((self.get_q_value(state, action) for action in actions), default=0)
+        return max((self.q.get((sorted_state, action), 0) for action in actions), default=0)
 
     def choose_action(self, state, is_training=False):
-        actions = NimLogic.available_actions(state)
-        if not actions:
+        sorted_state, index_mapping = self.normalize_state(state)
+
+        sorted_actions = set()
+        for sorted_idx, pile in enumerate(sorted_state):
+            sorted_actions.update((sorted_idx, j) for j in range(1, pile + 1))
+
+        if not sorted_actions:
             return None
 
         if is_training and random.random() < self.epsilon:
-            return random.choice(tuple(actions))
+            sorted_action = random.choice(tuple(sorted_actions))
+            original_pile_idx = index_mapping[sorted_action[0]]
+            return (original_pile_idx, sorted_action[1])
 
         best_value = float('-inf')
-        best_actions = []
+        best_sorted_actions = []
 
-        for action in actions:
-            q_value = self.get_q_value(state, action)
+        for sorted_action in sorted_actions:
+            q_value = self.q.get((sorted_state, sorted_action), 0)
+
             if q_value > best_value:
                 best_value = q_value
-                best_actions = [action]
+                best_sorted_actions = [sorted_action]
             elif q_value == best_value:
-                best_actions.append(action)
+                best_sorted_actions.append(sorted_action)
 
-        return random.choice(best_actions)
+        sorted_action = random.choice(best_sorted_actions)
+        original_pile_idx = index_mapping[sorted_action[0]]
+        return original_pile_idx, sorted_action[1]
 
     def get_move(self, game_state):
         return self.choose_action(game_state.piles)
