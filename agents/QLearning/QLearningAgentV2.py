@@ -1,15 +1,23 @@
 import random
 import os
 
+from agents.Agent import Agent
 from agents.QLearning.QLearningAgentV1 import QLearningAgentV1
 
 class QLearningAgentV2(QLearningAgentV1):
     def __init__(self, misere, max_piles, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999):
-        super().__init__(misere, max_piles, alpha, epsilon, gamma, decay_rate)
-        self.name = "Q-LearningV2"
+        Agent.__init__(self, "Q-LearningV2")
+        self.q = {}
+        self.alpha = alpha
+        self.epsilon = epsilon
+        self.initial_epsilon = epsilon
+        self.decay_rate = decay_rate
+        self.gamma = gamma
+        self.max_piles = max_piles
+        self.misere = misere
         self.save_path = f"savedAgents/qlearningV2-{'-'.join(str(p) for p in max_piles)}-{misere}.json"
 
-        self.q = {}
+        os.makedirs("savedAgents", exist_ok=True)
 
         if os.path.exists(self.save_path):
             self.load_q_values()
