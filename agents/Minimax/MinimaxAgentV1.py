@@ -20,7 +20,7 @@ class MinimaxAgentV1(Agent):
             return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            heuristic_score = NimLogic.heuristic_evaluation(state, player, self.misere)
+            heuristic_score = NimLogic.heuristic_evaluation(state, player)
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)

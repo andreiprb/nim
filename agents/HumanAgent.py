@@ -18,14 +18,16 @@ class HumanAgent(Agent):
 
         return pile, count
 
-    def get_available_actions(self, piles):
+    @staticmethod
+    def get_available_actions(piles):
         actions = set()
         for i, pile in enumerate(piles):
             for j in range(1, pile + 1):
                 actions.add((i, j))
         return actions
 
-    def get_int(self, prompt):
+    @staticmethod
+    def get_int(prompt):
         while True:
             user_input = input(prompt)
             try:
