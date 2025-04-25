@@ -4,21 +4,23 @@ from agents.Agent import Agent
 
 
 class OptimizedMinimaxAgent(Agent):
-    def __init__(self, max_depth=100):
-        super().__init__("Nim-optimized minimax")
-        self.max_depth = min(max_depth, 1)
-        self.default = 100
+    def __init__(self, misere, max_depth):
+        super().__init__("Optimized minimax")
+        self.misere = misere
+        self.max_depth = max(max_depth, 1)
+        self.default = self.max_depth
 
     def choose_action(self, state):
-        _, best_action = self._opt_minimax(state, 0, float('-inf'), float('inf'), 0)
+        _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
         return best_action
 
-    def _opt_minimax(self, state, player, alpha, beta, depth):
+    def _minimax(self, state, player, alpha, beta, depth):
         if all(pile == 0 for pile in state):
-            return (self.default - depth if player == 0 else depth - self.default), None
+            sign = 1 if player == self.misere else -1
+            return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            heuristic_score = NimLogic.heuristic_evaluation(state, player)
+            heuristic_score = NimLogic.heuristic_evaluation(state, player, self.misere)
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)
@@ -35,7 +37,7 @@ class OptimizedMinimaxAgent(Agent):
                 if NimLogic.p_or_n_position(new_state):
                     return self.default - depth, action
 
-                new_value, _ = self._opt_minimax(new_state, 1, alpha, beta, depth + 1)
+                new_value, _ = self._minimax(new_state, 1, alpha, beta, depth + 1)
                 if new_value > value:
                     value = new_value
                     best_action = action
@@ -54,7 +56,7 @@ class OptimizedMinimaxAgent(Agent):
                 if NimLogic.p_or_n_position(new_state):
                     return depth - self.default, action
 
-                new_value, _ = self._opt_minimax(new_state, 0, alpha, beta, depth + 1)
+                new_value, _ = self._minimax(new_state, 0, alpha, beta, depth + 1)
                 if new_value < value:
                     value = new_value
                     best_action = action

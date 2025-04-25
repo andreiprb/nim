@@ -8,7 +8,7 @@ class MinimaxAgent(Agent):
         super().__init__("Minimax")
         self.misere = misere
         self.max_depth = max(max_depth, 1)
-        self.default = 100
+        self.default = self.max_depth
 
     def choose_action(self, state):
         _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)

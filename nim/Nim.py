@@ -39,7 +39,7 @@ class Nim:
             pile, count = current_agent.choose_action(self.piles)
 
             if verbose:
-                print(f"Player {current_player} ({current_agent.name}) takes {count} from pile {pile}")
+                print(f"Player {int(current_player) + 1} ({current_agent.name}) takes {count} from pile {pile}")
 
             self.move((pile, count))
 
@@ -48,6 +48,6 @@ class Nim:
 
             if self.winner is not None:
                 if verbose:
-                    print(f"Player {self.winner} ({players[self.winner].name}) wins!")
+                    print(f"Player {int(self.winner) + 1} ({players[self.winner].name}) wins!")
 
         return self.winner
