@@ -20,7 +20,6 @@ class MinimaxAgentV2(MinimaxAgentV1):
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)
-        # actions = sorted(actions, key=lambda a: a[1], reverse=True)
 
         best_action = None
         is_endgame = all(pile <= 1 for pile in state)
