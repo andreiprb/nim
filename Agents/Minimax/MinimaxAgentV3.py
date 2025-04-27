@@ -4,12 +4,11 @@ from Agents.Agent import Agent
 
 
 class MinimaxAgentV3(Agent):
-    def __init__(self, misere, max_depth, reverse):
+    def __init__(self, misere, max_depth):
         super().__init__("MinimaxV3")
         self.misere = misere
         self.max_depth = max(max_depth, 1)
         self.default = self.max_depth
-        self.reverse = reverse
 
         self.nodes_explored = 0
         self.moves_count = 0
@@ -47,7 +46,7 @@ class MinimaxAgentV3(Agent):
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)
-        actions = sorted(actions, key=lambda x: x[1], reverse=self.reverse)
+        actions = sorted(actions, key=lambda x: x[1], reverse=True)
 
         best_action = None
 
