@@ -1,8 +1,8 @@
 import random
 import os
 
-from agents.Agent import Agent
-from agents.QLearning.QLearningAgentV1 import QLearningAgentV1
+from Agents.Agent import Agent
+from Agents.QLearning.QLearningAgentV1 import QLearningAgentV1
 
 class QLearningAgentV2(QLearningAgentV1):
     def __init__(self, misere, max_piles, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999):

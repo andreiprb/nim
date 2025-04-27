@@ -1,11 +1,11 @@
-from nim.NimLogic import NimLogic
+from Nim.NimLogic import NimLogic
 
-from agents.Agent import Agent
+from Agents.Agent import Agent
 
 
-class MinimaxAgentV1(Agent):
+class MinimaxAgentV2(Agent):
     def __init__(self, misere, max_depth):
-        super().__init__("MinimaxV1")
+        super().__init__("MinimaxV2")
         self.misere = misere
         self.max_depth = max(max_depth, 1)
         self.default = self.max_depth
@@ -13,6 +13,17 @@ class MinimaxAgentV1(Agent):
         self.nodes_explored = 0
         self.moves_count = 0
         self.mean_nodes = 0
+
+    def reset_stats(self):
+        self.nodes_explored = 0
+        self.moves_count = 0
+        self.mean_nodes = 0
+
+    def compute_mean_nodes(self):
+        if self.moves_count == 0:
+            return
+
+        self.mean_nodes = self.nodes_explored / self.moves_count
 
     def choose_action(self, state):
         self.moves_count += 1
@@ -35,6 +46,7 @@ class MinimaxAgentV1(Agent):
             return heuristic_score, None
 
         actions = NimLogic.available_actions(state)
+
         best_action = None
 
         if player == 0:
@@ -42,6 +54,9 @@ class MinimaxAgentV1(Agent):
             for action in actions:
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
+
+                if NimLogic.is_p_position(new_state, self.misere):
+                    return (self.default - depth), action
 
                 new_value, _ = self._minimax(new_state, 1, alpha, beta, depth + 1)
                 if new_value > value:
@@ -58,6 +73,9 @@ class MinimaxAgentV1(Agent):
             for action in actions:
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
+
+                if NimLogic.is_p_position(new_state, self.misere):
+                    return (depth - self.default), action
 
                 new_value, _ = self._minimax(new_state, 0, alpha, beta, depth + 1)
                 if new_value < value:

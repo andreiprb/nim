@@ -3,9 +3,9 @@ import json
 import os
 from tqdm import tqdm
 
-from agents.Agent import Agent
-from nim.NimLogic import NimLogic
-from nim.NimGameState import NimGameState
+from Agents.Agent import Agent
+from Nim.NimLogic import NimLogic
+from Nim.NimGameState import NimGameState
 
 
 class QLearningAgentV1(Agent):

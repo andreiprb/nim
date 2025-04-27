@@ -1,12 +1,36 @@
-from nim.NimLogic import NimLogic
+from Nim.NimLogic import NimLogic
 
-from agents.Minimax.MinimaxAgentV1 import MinimaxAgentV1
+from Agents.Agent import Agent
 
 
-class MinimaxAgentV2(MinimaxAgentV1):
+class MinimaxAgentV1(Agent):
     def __init__(self, misere, max_depth):
-        super().__init__(misere, max_depth)
-        self.name = "MinimaxV2"
+        super().__init__("MinimaxV1")
+        self.misere = misere
+        self.max_depth = max(max_depth, 1)
+        self.default = self.max_depth
+
+        self.nodes_explored = 0
+        self.moves_count = 0
+        self.mean_nodes = 0
+
+    def reset_stats(self):
+        self.nodes_explored = 0
+        self.moves_count = 0
+        self.mean_nodes = 0
+
+    def compute_mean_nodes(self):
+        if self.moves_count == 0:
+            return
+
+        self.mean_nodes = self.nodes_explored / self.moves_count
+
+    def choose_action(self, state):
+        self.moves_count += 1
+
+        _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
+
+        return best_action
 
     def _minimax(self, state, player, alpha, beta, depth):
         self.nodes_explored += 1
@@ -22,21 +46,12 @@ class MinimaxAgentV2(MinimaxAgentV1):
         actions = NimLogic.available_actions(state)
 
         best_action = None
-        is_endgame = all(pile <= 1 for pile in state)
 
         if player == 0:
             value = float('-inf')
             for action in actions:
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
-
-                is_p_position = NimLogic.p_or_n_position(new_state)
-
-                if is_p_position:
-                    if self.misere and is_endgame:
-                        return self.default - depth, action
-                    else:
-                        return depth - self.default, action
 
                 new_value, _ = self._minimax(new_state, 1, alpha, beta, depth + 1)
                 if new_value > value:
@@ -53,14 +68,6 @@ class MinimaxAgentV2(MinimaxAgentV1):
             for action in actions:
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
-
-                is_p_position = NimLogic.p_or_n_position(new_state)
-
-                if is_p_position:
-                    if self.misere and is_endgame:
-                        return depth - self.default, action
-                    else:
-                        return self.default - depth, action
 
                 new_value, _ = self._minimax(new_state, 0, alpha, beta, depth + 1)
                 if new_value < value:

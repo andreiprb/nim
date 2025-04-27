@@ -1,4 +1,4 @@
-from agents.Agent import Agent
+from Agents.Agent import Agent
 
 
 class HumanAgent(Agent):

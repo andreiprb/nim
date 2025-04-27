@@ -1,6 +1,6 @@
-from nim.NimLogic import NimLogic
+from Nim.NimLogic import NimLogic
 
-from agents.Agent import Agent
+from Agents.Agent import Agent
 
 import numpy as np
 import torch

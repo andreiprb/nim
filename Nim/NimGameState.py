@@ -1,4 +1,4 @@
-from nim.NimLogic import NimLogic
+from Nim.NimLogic import NimLogic
 
 
 class NimGameState:
@@ -32,6 +32,6 @@ class NimGameState:
             if new_state.misere:
                 new_state.winner = new_state.player
             else:
-                new_state.winner = NimLogic.other_player(new_state.player)
+                new_state.winner = self.player
 
         return new_state

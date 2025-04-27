@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class NimLogic(object):
     @staticmethod
     def available_actions(state):
@@ -13,19 +16,14 @@ class NimLogic(object):
 
     @staticmethod
     def nim_sum(state):
-        nim_sum = 0
-        for pile in state:
-            nim_sum ^= pile
-
-        return nim_sum
+        return np.bitwise_xor.reduce(state)
 
     @staticmethod
-    def p_or_n_position(state):
-        if all(pile <= 1 for pile in state):
-            one_piles = sum(1 for pile in state if pile == 1)
-            return one_piles % 2
+    def is_p_position(state, misere):
+        if misere and not any(pile > 1 for pile in state):
+            return sum(1 for pile in state if pile == 1) % 2
 
-        return NimLogic.nim_sum(state) == 0
+        return bool(NimLogic.nim_sum(state)) == 0
 
     @staticmethod
     def heuristic_evaluation(state, player, misere):
