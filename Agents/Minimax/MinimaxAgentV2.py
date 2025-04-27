@@ -38,7 +38,7 @@ class MinimaxAgentV2(Agent):
         self.nodes_explored += 1
 
         if all(pile == 0 for pile in state):
-            sign = 1 if player == self.misere else -1
+            sign = -1 if player == self.misere else 1
             return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
