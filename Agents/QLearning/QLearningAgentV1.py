@@ -9,7 +9,7 @@ from Nim.NimGameState import NimGameState
 
 
 class QLearningAgentV1(Agent):
-    def __init__(self, misere, max_piles, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999):
+    def __init__(self, misere, pile_count, max_pile, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999):
         super().__init__("Q-LearningV1")
         self.q = {}
         self.alpha = alpha
@@ -17,11 +17,11 @@ class QLearningAgentV1(Agent):
         self.initial_epsilon = epsilon
         self.decay_rate = decay_rate
         self.gamma = gamma
-        self.max_piles = max_piles
+        self.max_piles = [max_pile] * pile_count
         self.misere = misere
-        self.save_path = f"savedAgents/qlearningV1-{'-'.join(str(p) for p in max_piles)}-{misere}.json"
+        self.save_path = f"savedAgents/QLearning/qlearningV1-{max_pile}-{misere}.json"
 
-        os.makedirs("savedAgents", exist_ok=True)
+        os.makedirs("savedAgents/QLearning", exist_ok=True)
 
         if os.path.exists(self.save_path):
             self.load_q_values()
@@ -29,6 +29,9 @@ class QLearningAgentV1(Agent):
             self.train()
 
         print(f"Q-table dimensions: {len(self.q)}")
+
+    def reset_stats(self):
+        return
 
     def save_q_values(self):
         serializable_q = {f"{','.join(map(str, state))}|{action[0]},{action[1]}": value
@@ -95,7 +98,7 @@ class QLearningAgentV1(Agent):
         return self.choose_action(game_state.piles)
 
     def calculate_reward(self, state, next_state, game_over, player_won):
-        return 1.0 if game_over and player_won else -1.0 if game_over else -0.01
+        return 1.0 if game_over and player_won else -1.0
 
     def train(self, num_episodes=50000):
         for _ in tqdm(range(num_episodes)):
