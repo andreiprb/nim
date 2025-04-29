@@ -9,7 +9,7 @@ from Nim.NimGameState import NimGameState
 
 
 class QLearningAgentV1(Agent):
-    def __init__(self, misere, pile_count, max_pile, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999):
+    def __init__(self, misere, pile_count, max_pile, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999, num_episodes=10000):
         super().__init__("Q-LearningV1")
         self.q = {}
         self.alpha = alpha
@@ -17,9 +17,10 @@ class QLearningAgentV1(Agent):
         self.initial_epsilon = epsilon
         self.decay_rate = decay_rate
         self.gamma = gamma
+        self.num_episodes = num_episodes
         self.max_piles = [max_pile] * pile_count
         self.misere = misere
-        self.save_path = f"savedAgents/QLearning/qlearningV1-{max_pile}-{misere}.json"
+        self.save_path = f"savedAgents/QLearning/qlearningV1-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}-a{alpha}-e{epsilon}-g{gamma}-d{decay_rate}-ep{num_episodes}.json"
 
         os.makedirs("savedAgents/QLearning", exist_ok=True)
 
@@ -100,8 +101,8 @@ class QLearningAgentV1(Agent):
     def calculate_reward(self, state, next_state, game_over, player_won):
         return 1.0 if game_over and player_won else -1.0
 
-    def train(self, num_episodes=50000):
-        for _ in tqdm(range(num_episodes)):
+    def train(self):
+        for _ in tqdm(range(self.num_episodes)):
             state = NimGameState(self.max_piles.copy(), self.misere)
             episode_history = []
 
@@ -129,9 +130,6 @@ class QLearningAgentV1(Agent):
 
             for j in range(len(episode_history) - 1, -1, -1):
                 transition = episode_history[j]
-
-                if j < len(episode_history) - 1:
-                    transition['reward'] += self.gamma * episode_history[j + 1]['reward']
 
                 self.update_q_value(
                     transition['state'],
