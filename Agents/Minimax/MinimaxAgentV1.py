@@ -41,7 +41,7 @@ class MinimaxAgentV1(Agent):
 
         if self.max_depth is not None and depth >= self.max_depth:
             heuristic_score = NimLogic.heuristic_evaluation(state, player, self.misere)
-            return heuristic_score, None
+            return -heuristic_score if player == 0 else heuristic_score, None
 
         actions = NimLogic.available_actions(state)
 
