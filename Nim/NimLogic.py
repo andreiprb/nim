@@ -26,7 +26,7 @@ class NimLogic(object):
         return bool(NimLogic.nim_sum(state)) == 0
 
     @staticmethod
-    def heuristic_evaluation(state, player, misere):
+    def heuristic_evaluation(state, misere):
         one_piles = sum(1 for pile in state if pile == 1)
         greater_piles = sum(1 for pile in state if pile > 1)
 
