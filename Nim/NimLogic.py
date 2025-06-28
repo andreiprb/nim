@@ -39,3 +39,19 @@ class NimLogic(object):
             score = 10 if NimLogic.nim_sum(state) == 0 else -10
 
         return score
+
+    @staticmethod
+    def canonicalize_state(state):
+        indexed_piles = [(pile_size, i) for i, pile_size in enumerate(state)]
+        indexed_piles.sort(reverse=True)
+
+        canonical_state = [pile_size for pile_size, _ in indexed_piles]
+        index_mapping = [original_idx for _, original_idx in indexed_piles]
+
+        return canonical_state, index_mapping
+
+    @staticmethod
+    def map_action_to_original(action, index_mapping):
+        canonical_pile_idx, stones = action
+        original_pile_idx = index_mapping[canonical_pile_idx]
+        return original_pile_idx, stones

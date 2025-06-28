@@ -1,10 +1,4 @@
-from Agents.Agent import Agent
-
-
-class HumanAgent(Agent):
-    def __init__(self):
-        super().__init__("Human")
-
+class HumanAgent:
     def choose_action(self, piles):
         print("Your Turn")
         available_actions = self.get_available_actions(piles)

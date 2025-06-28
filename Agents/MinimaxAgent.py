@@ -1,14 +1,15 @@
 from Nim.NimLogic import NimLogic
 
-from Agents.Agent import Agent
 
-
-class MinimaxAgentV1(Agent):
-    def __init__(self, misere, max_depth):
-        super().__init__("MinimaxV1")
+class MinimaxAgent:
+    def __init__(self, misere, max_depth, canonical=False, P_pruning=False, aggressive=False):
         self.misere = misere
         self.max_depth = max(max_depth, 1)
         self.default = self.max_depth
+
+        self.canonical = canonical
+        self.P_pruning = P_pruning
+        self.sorting = aggressive
 
         self.nodes_explored = 0
         self.moves_count = 0
@@ -30,6 +31,8 @@ class MinimaxAgentV1(Agent):
 
         _, best_action = self._minimax(state, 0, float('-inf'), float('inf'), 0)
 
+        self.mean_nodes = self.nodes_explored / self.moves_count
+
         return best_action
 
     def _minimax(self, state, player, alpha, beta, depth):
@@ -43,7 +46,15 @@ class MinimaxAgentV1(Agent):
             heuristic_score = NimLogic.heuristic_evaluation(state, self.misere)
             return -heuristic_score if player == 0 else heuristic_score, None
 
+        """ CANONICALIZATION OF STATE """
+        if self.canonical:
+            state, index_mapping = NimLogic.canonicalize_state(state)
+
         actions = NimLogic.available_actions(state)
+
+        """ ACTION SORTING FOR AGGRESSIVE PLAYSTYLE """
+        if self.sorting:
+            actions = sorted(actions, key=lambda x: x[1], reverse=True)
 
         best_action = None
 
@@ -53,10 +64,20 @@ class MinimaxAgentV1(Agent):
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
 
+                """ PRUNING AFTER P_POSITIONS """
+                if self.P_pruning and NimLogic.is_p_position(new_state, self.misere):
+
+                    """ MAP ACTION TO ORIGINAL STATE """
+                    original_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
+
+                    return (self.default - depth), original_action
+
                 new_value, _ = self._minimax(new_state, 1, alpha, beta, depth + 1)
                 if new_value > value:
                     value = new_value
-                    best_action = action
+
+                    """ MAP ACTION TO ORIGINAL STATE """
+                    best_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
 
                 alpha = max(alpha, value)
                 if beta <= alpha:
@@ -69,10 +90,20 @@ class MinimaxAgentV1(Agent):
                 new_state = state.copy()
                 new_state[action[0]] -= action[1]
 
+                """ PRUNING AFTER P_POSITIONS """
+                if self.P_pruning and NimLogic.is_p_position(new_state, self.misere):
+
+                    """ MAP ACTION TO ORIGINAL STATE """
+                    original_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
+
+                    return (depth - self.default), original_action
+
                 new_value, _ = self._minimax(new_state, 0, alpha, beta, depth + 1)
                 if new_value < value:
                     value = new_value
-                    best_action = action
+
+                    """ MAP ACTION TO ORIGINAL STATE """
+                    best_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
 
                 beta = min(beta, value)
                 if beta <= alpha:
