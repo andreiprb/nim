@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/reinforcement_learning_nim.iml" filepath="$PROJECT_DIR$/.idea/reinforcement_learning_nim.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/nim.iml" filepath="$PROJECT_DIR$/.idea/nim.iml" />
     </modules>
   </component>
 </project>
