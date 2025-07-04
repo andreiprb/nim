@@ -1,4 +1,7 @@
 class HumanAgent:
+    def reset_stats(self):
+        return
+
     def choose_action(self, piles):
         print("Your Turn")
         available_actions = self.get_available_actions(piles)
