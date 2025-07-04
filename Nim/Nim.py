@@ -51,6 +51,6 @@ class Nim:
 
             if self.winner is not None:
                 if verbose:
-                    print(f"Player {int(self.winner) + 1} ({players[self.winner].__class__.name__}) wins!\n")
+                    print(f"Player {int(self.winner) + 1} ({players[self.winner].__class__.__name__}) wins!\n")
 
         return self.winner
