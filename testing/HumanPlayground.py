@@ -11,14 +11,14 @@ PILE_COUNT = 4
 MISERE = True
 
 agent1 = HumanAgent()
-agent2 = MinimaxAgent(misere=MISERE, max_depth=5)
+agent2 = MinimaxAgent(misere=MISERE, max_depth=5, canonical=True, P_pruning=True, aggressive=True)
 
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1
 
 game = Nim(
     initial_piles=np.random.randint(1, MAX_PILE, size=PILE_COUNT),
-    misere=MISERE
+    misere=np.random.rand() < 0.5
 )
 
 game.play(
