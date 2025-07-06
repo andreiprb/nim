@@ -9,8 +9,9 @@ from Nim.NimGameState import NimGameState
 
 
 class QLearningAgent:
-    def __init__(self, misere, pile_count, max_pile, override=False,
-                 alpha=0.3, epsilon=0.2, gamma=1.0, num_episodes=50000,
+    def __init__(self, misere, pile_count, max_pile,
+                 num_episodes, override=False,
+                 alpha=0.3, epsilon=0.3, gamma=1.0,
                  canonical=False):
         self.misere = misere
         self.pile_count = pile_count
@@ -26,10 +27,10 @@ class QLearningAgent:
 
         self.save_dir = "../savedAgents/QLearning"
         os.makedirs(self.save_dir, exist_ok=True)
-        self.filename = f"qlearning-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}{'-canonical' if canonical else ''}.json"
+        self.filename = f"qlearning-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}-{num_episodes}{'-canonical' if canonical else ''}.json"
         self.save_path = os.path.join(self.save_dir, self.filename)
 
-        if override or not self._load():
+        if not self._load() and not override:
             self.train(num_episodes)
             self._save()
 
@@ -39,17 +40,9 @@ class QLearningAgent:
         pass
 
     def get_q_value(self, state, action):
-        if self.canonical:
-            state, index_mapping = NimLogic.canonicalize_state(state)
-            action = (index_mapping[action[0]], action[1])
-
         return self.q.get((tuple(state), action), 0.0)
 
     def set_q_value(self, state, action, value):
-        if self.canonical:
-            state, index_mapping = NimLogic.canonicalize_state(state)
-            action = (index_mapping[action[0]], action[1])
-
         self.q[(tuple(state), action)] = value
 
     def get_state_value(self, state):
@@ -60,62 +53,70 @@ class QLearningAgent:
 
         return max(self.get_q_value(state, a) for a in actions)
 
-    def choose_action(self, piles, training=False):
-        actions = list(NimLogic.available_actions(piles))
+    def choose_action(self, state, training=False):
+        if self.canonical:
+            state, index_mapping = NimLogic.canonicalize_state(state)
+
+        actions = list(NimLogic.available_actions(state))
+
         if not actions:
             return None
 
-        if training and random.random() < self.epsilon:
-            return random.choice(actions)
+        chosen_action = self._choose_action(state, actions, training)
 
-        best_value = float('-inf')
-        best_actions = []
+        if self.canonical:
+            chosen_action = NimLogic.map_action_to_original(chosen_action, index_mapping)
 
-        for action in actions:
-            value = self.get_q_value(piles, action)
-            if value > best_value:
-                best_value = value
-                best_actions = [action]
-            elif value == best_value:
-                best_actions.append(action)
+        return chosen_action
 
-        return random.choice(best_actions)
+    def _choose_action(self, state, actions, training=False):
+        if training and np.random.random() < self.epsilon:
+            idx = np.random.randint(len(actions))
+            return actions[idx]
+
+        q_vals = [(self.get_q_value(state, a), a) for a in actions]
+        max_q = max(q_vals, key=lambda x: x[0])[0]
+        best = [a for q, a in q_vals if q == max_q]
+
+        idx = np.random.randint(len(best))
+        return best[idx]
 
     def learn_from_transition(self, state, action, next_state, game_over):
         current_q = self.get_q_value(state, action)
 
         if game_over:
-            if self.misere:
-                future_value = -1.0
-            else:
-                future_value = 1.0
+            future_value = -1.0 if self.misere else 1.0
         else:
-            future_value = -self.get_state_value(next_state)
+            future_value = -self.gamma * self.get_state_value(next_state)
 
         new_q = current_q + self.alpha * (future_value - current_q)
         self.set_q_value(state, action, new_q)
 
     def train(self, num_episodes):
         for _ in tqdm(range(num_episodes)):
-            piles = [self.max_pile] * self.pile_count
+            game_state = NimGameState([self.max_pile] * self.pile_count, self.misere)
+            while game_state.winner is None:
+                current_piles = game_state.piles.copy()
 
-            state = NimGameState(piles, self.misere)
+                if self.canonical:
+                    current_piles, index_mapping = NimLogic.canonicalize_state(current_piles)
 
-            while state.winner is None:
-                current_piles = state.piles.copy()
+                actions = list(NimLogic.available_actions(current_piles))
 
-                action = self.choose_action(current_piles, training=True)
-                if action is None:
+                if not actions:
                     break
 
-                state = state.apply_move(action)
+                action = self._choose_action(current_piles, actions, training=True)
+                copy_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
 
-                game_over = state.winner is not None
+                game_state = game_state.apply_move(copy_action)
+                new_state_piles = game_state.piles if not self.canonical else NimLogic.canonicalize_state(game_state.piles)[0]
+
                 self.learn_from_transition(
                     current_piles,
                     action,
-                    state.piles.copy(),
-                    game_over
+                    new_state_piles.copy(),
+                    game_state.winner is not None
                 )
 
     def _save(self):

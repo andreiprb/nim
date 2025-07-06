@@ -5,13 +5,14 @@ from Nim.Nim import Nim
 from Agents.HumanAgent import HumanAgent
 
 from Agents.MinimaxAgent import MinimaxAgent
+from Agents.QLearningAgent import QLearningAgent
 
-MAX_PILE = 5
+MAX_PILE = 7
 PILE_COUNT = 4
 MISERE = True
 
 agent1 = HumanAgent()
-agent2 = MinimaxAgent(misere=MISERE, max_depth=5, canonical=True, P_pruning=True, aggressive=True)
+agent2 = QLearningAgent(misere=MISERE, pile_count=PILE_COUNT, max_pile=MAX_PILE, canonical=True, num_episodes=1000000)
 
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1
