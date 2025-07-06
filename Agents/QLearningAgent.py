@@ -3,14 +3,12 @@ import json
 import os
 from tqdm import tqdm
 
-from Agents.Agent import Agent
 from Nim.NimLogic import NimLogic
 from Nim.NimGameState import NimGameState
 
 
-class QLearningAgentV1(Agent):
+class QLearningAgent:
     def __init__(self, misere, pile_count, max_pile, alpha=0.5, epsilon=0.1, gamma=0.9, decay_rate=0.9999, num_episodes=10000):
-        super().__init__("Q-LearningV1")
         self.q = {}
         self.alpha = alpha
         self.epsilon = epsilon
@@ -20,7 +18,7 @@ class QLearningAgentV1(Agent):
         self.num_episodes = num_episodes
         self.max_piles = [max_pile] * pile_count
         self.misere = misere
-        self.save_path = f"savedAgents/QLearning/qlearningV1-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}-a{alpha}-e{epsilon}-g{gamma}-d{decay_rate}-ep{num_episodes}.json"
+        self.save_path = f"savedAgents/QLearning/qlearning-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}-a{alpha}-e{epsilon}-g{gamma}-d{decay_rate}-ep{num_episodes}.json"
 
         os.makedirs("savedAgents/QLearning", exist_ok=True)
 

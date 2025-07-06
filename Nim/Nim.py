@@ -1,7 +1,6 @@
 from Nim.NimGameState import NimGameState
 
 
-
 class Nim:
     def __init__(self, initial_piles, misere=True):
         self.state = NimGameState(initial_piles, misere)
@@ -22,9 +21,6 @@ class Nim:
     @property
     def is_misere(self):
         return self.misere
-
-    def move(self, action):
-        self.state = self.state.apply_move(action)
 
     def play(self, player1, player2, verbose=True):
         player1.reset_stats()
@@ -47,7 +43,7 @@ class Nim:
             if verbose:
                 print(f"Player {int(current_player) + 1} ({current_agent.__class__.__name__}) takes {count} from pile {pile}")
 
-            self.move((pile, count))
+            self.state.apply_move((pile, count))
 
             if self.winner is not None:
                 if verbose:
