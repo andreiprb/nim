@@ -43,7 +43,7 @@ class Nim:
             if verbose:
                 print(f"Player {int(current_player) + 1} ({current_agent.__class__.__name__}) takes {count} from pile {pile}")
 
-            self.state.apply_move((pile, count))
+            self.state = self.state.apply_move((pile, count))
 
             if self.winner is not None:
                 if verbose:
