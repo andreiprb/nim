@@ -1,6 +1,6 @@
 import numpy as np
 from math import log2, floor
-from bisect import bisect_left
+from bisect import bisect_right
 
 
 class NimLogic(object):
@@ -53,12 +53,12 @@ class NimLogic(object):
         return canonical_state, index_mapping
 
     @staticmethod
-    def bubble_down(S, index, mapping):
-        while index > 0 and S[index] < S[index - 1]:
-            S[index], S[index - 1] = S[index - 1], S[index]
-            mapping[index], mapping[index - 1] = \
-                mapping[index - 1], mapping[index]
-            index -= 1
+    def bubble_up(S, index, mapping):
+        while index < len(S) - 1 and S[index] <= S[index + 1]:
+            S[index], S[index + 1] = S[index + 1], S[index]
+            mapping[index], mapping[index + 1] =\
+                mapping[index + 1], mapping[index]
+            index += 1
         return index
 
     @staticmethod
@@ -70,16 +70,15 @@ class NimLogic(object):
 
         changed = True
         while changed:
-
             changed = False
 
             for p in range(max_power, -1, -1):
                 power_of_two = 1 << p
 
                 while True:
-                    left = bisect_left(state, power_of_two)
+                    right = bisect_right(state, power_of_two)
 
-                    indices = [i for i in range(left, len(state)) if state[i] & power_of_two]
+                    indices = [i for i in range(right) if state[i] & power_of_two]
 
                     if len(indices) < 2:
                         break
@@ -89,13 +88,16 @@ class NimLogic(object):
                     if i == j:
                         break
 
+                    if sum(state) == 2 * power_of_two:
+                        return state, mapping
+
                     state[i] -= power_of_two
                     state[j] -= power_of_two
-                    changed = True
 
-                    new_j = NimLogic.bubble_down(state, j, mapping)
-                    if i < new_j:
-                        NimLogic.bubble_down(state, i, mapping)
+                    NimLogic.bubble_up(state, j, mapping)
+                    NimLogic.bubble_up(state, i, mapping)
+
+                    changed = True
 
         return state, mapping
 

@@ -67,7 +67,6 @@ class QLearningAgent:
 
         """ REDUCTION OF STATE """
         if self.reduced:
-            # TODO
             new_state, index_mapping = NimLogic.reduce_state(state, index_mapping)
 
         actions = list(NimLogic.available_actions(state))
@@ -117,9 +116,10 @@ class QLearningAgent:
                 if self.canonical:
                     current_piles, index_mapping = NimLogic.canonicalize_state(current_piles)
 
+                # TODO: Reduction doesn't work, saved states are regular
+
                 """ REDUCTION OF STATE """
                 if self.reduced:
-                    # TODO
                     current_piles, index_mapping = NimLogic.reduce_state(current_piles, index_mapping)
 
                 actions = list(NimLogic.available_actions(current_piles))
@@ -136,17 +136,17 @@ class QLearningAgent:
                     copy_action = action
 
                 game_state = game_state.apply_move(copy_action)
+                new_state_piles = game_state.piles
 
                 """ CANONICALIZATION OF STATE """
                 if self.canonical:
                     new_state_piles, index_mapping = NimLogic.canonicalize_state(game_state.piles)
 
-                    """ REDUCTION OF STATE """
-                    if self.reduced:
-                        new_state_piles, _ = NimLogic.reduce_state(new_state_piles, index_mapping)
+                # TODO: Reduction doesn't work, saved states are regular
 
-                else:
-                    new_state_piles = game_state.piles
+                """ REDUCTION OF STATE """
+                if self.reduced:
+                    new_state_piles, _ = NimLogic.reduce_state(new_state_piles, index_mapping)
 
                 self.learn_from_transition(
                     current_piles,

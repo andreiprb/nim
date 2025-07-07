@@ -13,10 +13,7 @@ def generate_sorted_arrays(length, max_val, min_val=0):
             yield [first] + rest
 
 
-if __name__ == '__main__':
-    max_value = 15
-    array_length = 4
-
+def test_over_range(max_value, array_length):
     originals = dict()
     results = dict()
 
@@ -34,3 +31,16 @@ if __name__ == '__main__':
 
     print(f"Sorted arrays tested: {len(originals)}")
     print(f"Unique results: {len(results)}")
+
+
+if __name__ == '__main__':
+    original = [6, 8, 4, 3]
+    print("Original:", original)
+
+    canonical, index_mapping = NimLogic.canonicalize_state(original)
+    print("Canonical:", canonical)
+    print("Index Mapping:", index_mapping)
+
+    reduced, index_mapping = NimLogic.reduce_state(canonical.copy(), index_mapping)
+    print("Reduced:", reduced)
+    print("Index Mapping:", index_mapping)
