@@ -1,4 +1,6 @@
 import numpy as np
+from math import log2, floor
+from bisect import bisect_left
 
 
 class NimLogic(object):
@@ -49,6 +51,53 @@ class NimLogic(object):
         index_mapping = [original_idx for _, original_idx in indexed_piles]
 
         return canonical_state, index_mapping
+
+    @staticmethod
+    def bubble_down(S, index, mapping):
+        while index > 0 and S[index] < S[index - 1]:
+            S[index], S[index - 1] = S[index - 1], S[index]
+            mapping[index], mapping[index - 1] = \
+                mapping[index - 1], mapping[index]
+            index -= 1
+        return index
+
+    @staticmethod
+    def reduce_state(state, mapping):
+        if not state or max(state) == 0:
+            return state, mapping
+
+        max_power = floor(log2(max(state)))
+
+        changed = True
+        while changed:
+
+            changed = False
+
+            for p in range(max_power, -1, -1):
+                power_of_two = 1 << p
+
+                while True:
+                    left = bisect_left(state, power_of_two)
+
+                    indices = [i for i in range(left, len(state)) if state[i] & power_of_two]
+
+                    if len(indices) < 2:
+                        break
+
+                    i, j = indices[0], indices[-1]
+
+                    if i == j:
+                        break
+
+                    state[i] -= power_of_two
+                    state[j] -= power_of_two
+                    changed = True
+
+                    new_j = NimLogic.bubble_down(state, j, mapping)
+                    if i < new_j:
+                        NimLogic.bubble_down(state, i, mapping)
+
+        return state, mapping
 
     @staticmethod
     def map_action_to_original(action, index_mapping):
