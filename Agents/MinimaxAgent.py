@@ -1,4 +1,5 @@
 from Nim.NimLogic import NimLogic
+from HelperLogic.HelperLogic import HelperLogic
 
 
 class MinimaxAgent:
@@ -43,12 +44,12 @@ class MinimaxAgent:
             return sign * (self.default - depth), None
 
         if self.max_depth is not None and depth >= self.max_depth:
-            heuristic_score = NimLogic.heuristic_evaluation(state, self.misere)
+            heuristic_score = HelperLogic.heuristic_evaluation(state, self.misere)
             return -heuristic_score if player == 0 else heuristic_score, None
 
         """ CANONICALIZATION OF STATE """
         if self.canonical:
-            state, index_mapping = NimLogic.canonicalize_state(state)
+            state, index_mapping = HelperLogic.canonicalize_state(state)
 
         actions = NimLogic.available_actions(state)
 
@@ -68,7 +69,7 @@ class MinimaxAgent:
                 if self.P_pruning and NimLogic.is_p_position(new_state, self.misere):
 
                     """ MAP ACTION TO ORIGINAL STATE """
-                    original_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
+                    original_action = action if not self.canonical else HelperLogic.map_action_to_original(action, index_mapping)
 
                     return (self.default - depth), original_action
 
@@ -77,7 +78,7 @@ class MinimaxAgent:
                     value = new_value
 
                     """ MAP ACTION TO ORIGINAL STATE """
-                    best_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
+                    best_action = action if not self.canonical else HelperLogic.map_action_to_original(action, index_mapping)
 
                 alpha = max(alpha, value)
                 if beta <= alpha:
@@ -94,7 +95,7 @@ class MinimaxAgent:
                 if self.P_pruning and NimLogic.is_p_position(new_state, self.misere):
 
                     """ MAP ACTION TO ORIGINAL STATE """
-                    original_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
+                    original_action = action if not self.canonical else HelperLogic.map_action_to_original(action, index_mapping)
 
                     return (depth - self.default), original_action
 
@@ -103,7 +104,7 @@ class MinimaxAgent:
                     value = new_value
 
                     """ MAP ACTION TO ORIGINAL STATE """
-                    best_action = action if not self.canonical else NimLogic.map_action_to_original(action, index_mapping)
+                    best_action = action if not self.canonical else HelperLogic.map_action_to_original(action, index_mapping)
 
                 beta = min(beta, value)
                 if beta <= alpha:

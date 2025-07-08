@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 from Nim.NimLogic import NimLogic
 from Nim.NimGameState import NimGameState
+from HelperLogic.HelperLogic import HelperLogic
 
 
 class QLearningAgent:
@@ -28,12 +29,12 @@ class QLearningAgent:
         os.makedirs(self.save_dir, exist_ok=True)
         self.filename = (f"qlearning-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}"
                          f"{'-canonical' if canonical else ''}"
-                         f"{'-reduced' if reduced else ''}-{num_episodes}.json")
+                         f"{'-reduced' if reduced else ''}{f'-{num_episodes}' if reduced else ''}.json")
         self.save_path = os.path.join(self.save_dir, self.filename)
 
         if not self._load() and not override:
             self.train(num_episodes)
-            self._save()
+            # self._save()
 
         print(f"Agent ready. Q-table size: {len(self.q)}")
 
@@ -59,15 +60,17 @@ class QLearningAgent:
             idx = np.random.randint(len(actions))
             return actions[idx]
 
+        return None
+
     def choose_action(self, state, training=False):
         """"""
         """ CANONICALIZATION OF STATE """
         if self.canonical:
-            state, index_mapping = NimLogic.canonicalize_state(state)
+            state, index_mapping = HelperLogic.canonicalize_state(state)
 
         """ REDUCTION OF STATE """
         if self.reduced:
-            new_state, index_mapping = NimLogic.reduce_state(state, index_mapping)
+            state, index_mapping = HelperLogic.reduce_state(state, index_mapping)
 
         actions = list(NimLogic.available_actions(state))
 
@@ -78,7 +81,7 @@ class QLearningAgent:
 
         """ MAP ACTION TO ORIGINAL INDEX """
         if self.canonical:
-            chosen_action = NimLogic.map_action_to_original(chosen_action, index_mapping)
+            chosen_action = HelperLogic.map_action_to_original(chosen_action, index_mapping)
 
         return chosen_action
 
@@ -114,13 +117,11 @@ class QLearningAgent:
 
                 """ CANONICALIZATION OF STATE """
                 if self.canonical:
-                    current_piles, index_mapping = NimLogic.canonicalize_state(current_piles)
-
-                # TODO: Reduction doesn't work, saved states are regular
+                    current_piles, index_mapping = HelperLogic.canonicalize_state(current_piles)
 
                 """ REDUCTION OF STATE """
                 if self.reduced:
-                    current_piles, index_mapping = NimLogic.reduce_state(current_piles, index_mapping)
+                    current_piles, index_mapping = HelperLogic.reduce_state(current_piles, index_mapping)
 
                 actions = list(NimLogic.available_actions(current_piles))
 
@@ -131,7 +132,7 @@ class QLearningAgent:
 
                 """ MAP ACTION TO ORIGINAL INDEX """
                 if self.canonical:
-                    copy_action = NimLogic.map_action_to_original(action, index_mapping)
+                    copy_action = HelperLogic.map_action_to_original(action, index_mapping)
                 else:
                     copy_action = action
 
@@ -140,13 +141,11 @@ class QLearningAgent:
 
                 """ CANONICALIZATION OF STATE """
                 if self.canonical:
-                    new_state_piles, index_mapping = NimLogic.canonicalize_state(game_state.piles)
-
-                # TODO: Reduction doesn't work, saved states are regular
+                    new_state_piles, index_mapping = HelperLogic.canonicalize_state(game_state.piles)
 
                 """ REDUCTION OF STATE """
                 if self.reduced:
-                    new_state_piles, _ = NimLogic.reduce_state(new_state_piles, index_mapping)
+                    new_state_piles, _ = HelperLogic.reduce_state(new_state_piles, index_mapping)
 
                 self.learn_from_transition(
                     current_piles,
