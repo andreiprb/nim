@@ -29,14 +29,17 @@ class QLearningAgent:
         os.makedirs(self.save_dir, exist_ok=True)
         self.filename = (f"qlearning-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}"
                          f"{'-canonical' if canonical else ''}"
-                         f"{'-reduced' if reduced else ''}{f'-{num_episodes}' if reduced else ''}.json")
+                         f"{'-reduced' if reduced else ''}-{num_episodes}.json")
         self.save_path = os.path.join(self.save_dir, self.filename)
 
         if not self._load() and not override:
             self.train(num_episodes)
-            # self._save()
+            self._save()
 
-        print(f"Agent ready. Q-table size: {len(self.q)}")
+        print(f"{self} ready. Q-table size: {len(self.q)}")
+
+    def __str__(self):
+        return f"{'Reduced ' if self.reduced else 'Canonical ' if self.canonical else ''}QLearning Agent"
 
     def reset_stats(self):
         pass
@@ -70,7 +73,7 @@ class QLearningAgent:
 
         """ REDUCTION OF STATE """
         if self.reduced:
-            state, index_mapping = HelperLogic.reduce_state(state, index_mapping)
+            state = HelperLogic.reduce_state(state)
 
         actions = list(NimLogic.available_actions(state))
 
@@ -121,7 +124,7 @@ class QLearningAgent:
 
                 """ REDUCTION OF STATE """
                 if self.reduced:
-                    current_piles, index_mapping = HelperLogic.reduce_state(current_piles, index_mapping)
+                    current_piles = HelperLogic.reduce_state(current_piles)
 
                 actions = list(NimLogic.available_actions(current_piles))
 
@@ -145,7 +148,7 @@ class QLearningAgent:
 
                 """ REDUCTION OF STATE """
                 if self.reduced:
-                    new_state_piles, _ = HelperLogic.reduce_state(new_state_piles, index_mapping)
+                    new_state_piles = HelperLogic.reduce_state(new_state_piles)
 
                 self.learn_from_transition(
                     current_piles,

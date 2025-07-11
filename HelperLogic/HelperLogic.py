@@ -1,4 +1,5 @@
 from math import log2, floor
+import numpy as np
 
 from Nim.NimLogic import NimLogic
 
@@ -15,51 +16,22 @@ class HelperLogic(object):
         return canonical_state, index_mapping
 
     @staticmethod
-    def bubble_up(S, index, mapping):
-        while index < len(S) - 1 and S[index] <= S[index + 1]:
-            S[index], S[index + 1] = S[index + 1], S[index]
-            mapping[index], mapping[index + 1] = \
-                mapping[index + 1], mapping[index]
-            index += 1
-        return index
+    def reduce_state(state):
+        max_val = max(state) if state else 0
+        max_power = floor(log2(max_val)) if max_val > 0 else 0
 
-    @staticmethod
-    def reduce_state(state, mapping):
-        if not state or all(pile <= 1 for pile in state):
-            return state, mapping
+        for i in range(len(state)):
+            for j in range(len(state) - 1, i, -1):
+                for p in range(max_power, -1, -1):
+                    power = 1 << p
+                    if state[i] & power and state[j] & power:
+                        if power * 2 == np.sum(state):
+                            return state
 
-        max_power = floor(log2(max(state)))
+                        state[i] -= power
+                        state[j] -= power
 
-        changed = True
-        while changed:
-            changed = False
-
-            for p in range(max_power, -1, -1):
-                power_of_two = 1 << p
-
-                while True:
-                    indices = [i for i in range(len(state)) if state[i] >= power_of_two and state[i] & power_of_two]
-
-                    if len(indices) < 2:
-                        break
-
-                    i, j = indices[0], indices[-1]
-
-                    if i == j:
-                        break
-
-                    if sum(state) == 2 * power_of_two:
-                        return state, mapping
-
-                    state[i] -= power_of_two
-                    state[j] -= power_of_two
-
-                    HelperLogic.bubble_up(state, j, mapping)
-                    HelperLogic.bubble_up(state, i, mapping)
-
-                    changed = True
-
-        return state, mapping
+        return state
 
     @staticmethod
     def map_action_to_original(action, index_mapping):
@@ -68,13 +40,13 @@ class HelperLogic(object):
         return original_pile_idx, stones
 
     @staticmethod
-    def generate_sorted_arrays(length, max_val, min_val=0):
+    def generate_sorted_arrays_desc(length, max_val, min_val=0):
         if length == 0:
             yield []
             return
 
-        for first in range(min_val, max_val + 1):
-            for rest in HelperLogic.generate_sorted_arrays(length - 1, max_val, first):
+        for first in range(max_val, min_val - 1, -1):
+            for rest in HelperLogic.generate_sorted_arrays_desc(length - 1, first, min_val):
                 yield [first] + rest
 
     @staticmethod

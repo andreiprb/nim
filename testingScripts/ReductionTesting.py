@@ -7,11 +7,11 @@ def test_over_range(max_value, array_length):
     originals = dict()
     results = dict()
 
-    for test_array in HelperLogic.generate_sorted_arrays(array_length, max_value):
+    for test_array in HelperLogic.generate_sorted_arrays_desc(array_length, max_value):
         original = np.array(test_array)
         original_xor = np.bitwise_xor.reduce(original)
 
-        result, _ = HelperLogic.reduce_state(test_array.copy(), list(range(len(test_array))))
+        result = HelperLogic.reduce_state(test_array.copy())
         result_xor = np.bitwise_xor.reduce(np.array(result))
 
         originals[str(original)] = 0
@@ -24,15 +24,14 @@ def test_over_range(max_value, array_length):
 
 
 if __name__ == '__main__':
-    original = [3, 4, 2, 2]
+    original = [2, 7, 6, 5]
     print("Original:", original)
 
     canonical, index_mapping = HelperLogic.canonicalize_state(original)
     print("Canonical:", canonical)
     print("Index Mapping:", index_mapping)
 
-    reduced, index_mapping = HelperLogic.reduce_state(canonical.copy(), index_mapping)
+    reduced = HelperLogic.reduce_state(canonical.copy())
     print("Reduced:", reduced)
-    print("Index Mapping:", index_mapping)
 
     test_over_range(7, 4)
