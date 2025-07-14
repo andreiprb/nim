@@ -1,5 +1,5 @@
-from Nim.NimLogic import NimLogic
-from HelperLogic.HelperLogic import HelperLogic
+from nim import NimLogic
+from helper import HelperLogic
 
 
 class MinimaxAgent:

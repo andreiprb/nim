@@ -2,9 +2,9 @@ import json, os
 import numpy as np
 from tqdm import tqdm
 
-from Nim.NimLogic import NimLogic
-from Nim.NimGameState import NimGameState
-from HelperLogic.HelperLogic import HelperLogic
+from nim import NimLogic
+from nim import NimGameState
+from helper import HelperLogic
 
 
 class QLearningAgent:

@@ -1,7 +1,7 @@
 from math import log2, floor
 import numpy as np
 
-from Nim.NimLogic import NimLogic
+from nim.NimLogic import NimLogic
 
 
 class HelperLogic(object):

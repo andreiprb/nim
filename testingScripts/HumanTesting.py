@@ -1,12 +1,12 @@
 import numpy as np
 
-from Nim.Nim import Nim
+from nim.Nim import Nim
 
-from Agents.HumanAgent import HumanAgent
-from Agents.AlgorithmicAgent import AlgorithmicAgent
+from agents.HumanAgent import HumanAgent
+from agents.AlgorithmicAgent import AlgorithmicAgent
 
-from Agents.MinimaxAgent import MinimaxAgent
-from Agents.QLearningAgent import QLearningAgent
+from agents.MinimaxAgent import MinimaxAgent
+from agents.QLearningAgent import QLearningAgent
 
 MAX_PILE = 7
 PILE_COUNT = 4

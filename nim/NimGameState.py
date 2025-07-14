@@ -1,4 +1,4 @@
-from Nim.NimLogic import NimLogic
+from nim.NimLogic import NimLogic
 
 
 class NimGameState:
