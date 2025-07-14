@@ -8,7 +8,7 @@ class AlgorithmicAgent:
         self.misere = misere
 
     def __str__(self):
-        return "Math Agent"
+        return "Algorithmic Agent"
 
     def reset_stats(self):
         pass
