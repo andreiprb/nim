@@ -3,7 +3,7 @@ import numpy as np
 from Nim.Nim import Nim
 
 from Agents.HumanAgent import HumanAgent
-from Agents.MathAgent import MathAgent
+from Agents.AlgorithmicAgent import AlgorithmicAgent
 
 from Agents.MinimaxAgent import MinimaxAgent
 from Agents.QLearningAgent import QLearningAgent
@@ -13,7 +13,7 @@ PILE_COUNT = 4
 MISERE = np.random.rand() < 0.5
 
 agent1 = HumanAgent()
-agent2 = MathAgent(misere=MISERE)
+agent2 = AlgorithmicAgent(misere=MISERE)
 
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1

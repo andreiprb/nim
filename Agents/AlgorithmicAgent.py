@@ -3,7 +3,7 @@ import numpy as np
 from Nim.NimLogic import NimLogic
 
 
-class MathAgent:
+class AlgorithmicAgent:
     def __init__(self, misere):
         self.misere = misere
 
