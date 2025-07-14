@@ -3,23 +3,24 @@ import numpy as np
 from Nim.Nim import Nim
 
 from Agents.HumanAgent import HumanAgent
+from Agents.MathAgent import MathAgent
 
 from Agents.MinimaxAgent import MinimaxAgent
 from Agents.QLearningAgent import QLearningAgent
 
 MAX_PILE = 7
 PILE_COUNT = 4
-MISERE = True
+MISERE = np.random.rand() < 0.5
 
 agent1 = HumanAgent()
-agent2 = QLearningAgent(misere=MISERE, pile_count=PILE_COUNT, max_pile=MAX_PILE, canonical=True, num_episodes=1000000)
+agent2 = MathAgent(misere=MISERE)
 
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1
 
 game = Nim(
     initial_piles=np.random.randint(1, MAX_PILE, size=PILE_COUNT),
-    misere=np.random.rand() < 0.5
+    misere=MISERE
 )
 
 game.play(

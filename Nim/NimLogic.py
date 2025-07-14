@@ -11,6 +11,16 @@ class NimLogic(object):
         return actions
 
     @staticmethod
+    def random_action(actions):
+        idx = np.random.randint(len(actions))
+        return actions[idx]
+
+    @staticmethod
+    def random_action_from_state(state):
+        actions = NimLogic.available_actions(state)
+        return NimLogic.random_action(list(actions))
+
+    @staticmethod
     def other_player(player):
         return not player
 

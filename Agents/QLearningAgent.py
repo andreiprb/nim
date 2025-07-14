@@ -58,13 +58,6 @@ class QLearningAgent:
 
         return max(self.get_q_value(state, a) for a in actions)
 
-    def _random_action(self, actions, training=False):
-        if training and np.random.random() < self.epsilon:
-            idx = np.random.randint(len(actions))
-            return actions[idx]
-
-        return None
-
     def choose_action(self, state, training=False):
         """"""
         """ CANONICALIZATION OF STATE """
@@ -89,10 +82,8 @@ class QLearningAgent:
         return chosen_action
 
     def _choose_action(self, state, actions, training=False):
-        random_action = self._random_action(actions, training=training)
-
-        if random_action is not None:
-            return random_action
+        if training and np.random.random() < self.epsilon:
+            return NimLogic.random_action(actions)
 
         q_vals = [(self.get_q_value(state, a), a) for a in actions]
         max_q = max(q_vals, key=lambda x: x[0])[0]
