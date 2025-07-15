@@ -1,6 +1,6 @@
 from typing import Generator
 
-from nim import NimLogic
+from nim.NimLogic import NimLogic
 
 
 class HelperLogic:

@@ -1,30 +1,45 @@
 import numpy as np
 
-from nim import NimLogic
+from nim.NimLogic import NimLogic
 
-from helper.HelperAgent import HelperAgent
+from base.BaseAgent import BaseAgent
 
 
-class AlgorithmicAgent(HelperAgent):
+class AlgorithmicAgent(BaseAgent):
+    """
+    An agent that uses the known mathematical strategy to play Nim.
+    """
     def __init__(self, misere):
+        """
+        Initializes the AlgorithmicAgent.
+        """
         super().__init__()
-        self.misere = misere
+        self.misere: bool = misere
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the agent.
+        """
         return "Algorithmic Agent"
 
     def reset_stats(self):
+        """
+        Resets the statistics of the agent.
+        """
         pass
 
-    def choose_action(self, state):
-        xor = np.bitwise_xor.reduce(state)
+    def choose_action(self, state: list[int]) -> tuple[int, int]:
+        """
+        Chooses an action based on the current state of the game.
+        """
+        xor: int = np.bitwise_xor.reduce(state)
 
         if self.misere:
-            big = [i for i, h in enumerate(state) if h > 1]
+            big: list[int] = [i for i, h in enumerate(state) if h > 1]
 
             if len(big) == 1:
-                i = big[0]
-                count = int(np.count_nonzero(np.array(state) > 0))
+                i: int = big[0]
+                count: int = int(np.count_nonzero(np.array(state) > 0))
 
                 return i, state[i] - int(count % 2)
 

@@ -2,15 +2,15 @@ import json, os
 import numpy as np
 from tqdm import tqdm
 
-from nim import NimLogic
-from nim import NimGameState
+from nim.NimLogic import NimLogic
+from nim.NimGameState import NimGameState
 
-from helper import HelperLogic
+from helpers.HelperLogic import HelperLogic
 
-from helper import HelperAgent
+from base.BaseAgent import BaseAgent
 
 
-class QLearningAgent(HelperAgent):
+class QLearningAgent(BaseAgent):
     def __init__(self, misere, pile_count, max_pile,
                  num_episodes, override=False,
                  alpha=0.3, epsilon=0.3, gamma=1.0,

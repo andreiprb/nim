@@ -1,25 +1,28 @@
 import numpy as np
 
-from nim.NimGame import NimGame
+from nim import NimGame
 
-from agents.HumanAgent import HumanAgent
-from agents.AlgorithmicAgent import AlgorithmicAgent
+from base import BaseAgent
 
-from agents.MinimaxAgent import MinimaxAgent
-from agents.QLearningAgent import QLearningAgent
+from agents import HumanAgent
+from agents import AlgorithmicAgent
 
-MAX_PILE = 7
-PILE_COUNT = 4
-MISERE = np.random.rand() < 0.5
+MAX_PILE: int = 7
+PILE_COUNT: int = 4
+MISERE: bool = np.random.rand() < 0.5
 
-agent1 = HumanAgent()
-agent2 = AlgorithmicAgent(misere=MISERE)
+agent1: BaseAgent = HumanAgent()
+agent2: BaseAgent = AlgorithmicAgent(misere=MISERE)
 
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1
 
 game = NimGame(
-    initial_piles=np.random.randint(1, MAX_PILE, size=PILE_COUNT),
+    initial_piles=list[int](np.random.randint(
+        1,
+        MAX_PILE + 1,
+        size=PILE_COUNT
+    ).tolist()),
     misere=MISERE
 )
 

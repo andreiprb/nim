@@ -1,12 +1,18 @@
-from nim import NimLogic
+from nim.NimLogic import NimLogic
 
-from helper import HelperLogic
+from helpers.HelperLogic import HelperLogic
 
-from helper import HelperAgent
+from base.BaseAgent import BaseAgent
 
 
-class MinimaxAgent(HelperAgent):
+class MinimaxAgent(BaseAgent):
+    """
+    Minimax Agent for Nim game.
+    """
     def __init__(self, misere, max_depth, canonical=False, P_pruning=False, aggressive=False):
+        """
+        Initializes the MinimaxAgent.
+        """
         super().__init__()
 
         self.misere = misere
@@ -21,7 +27,16 @@ class MinimaxAgent(HelperAgent):
         self.moves_count = 0
         self.mean_nodes = 0
 
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the agent.
+        """
+        return "Minimax Agent"
+
     def reset_stats(self):
+        """
+        Resets the statistics of the agent.
+        """
         self.nodes_explored = 0
         self.moves_count = 0
         self.mean_nodes = 0
