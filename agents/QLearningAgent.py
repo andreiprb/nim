@@ -6,12 +6,16 @@ from nim import NimLogic
 from nim import NimGameState
 from helper import HelperLogic
 
+from agents import Agent
 
-class QLearningAgent:
+
+class QLearningAgent(Agent):
     def __init__(self, misere, pile_count, max_pile,
                  num_episodes, override=False,
                  alpha=0.3, epsilon=0.3, gamma=1.0,
                  canonical=False, reduced=False):
+        super().__init__()
+
         self.misere = misere
         self.pile_count = pile_count
         self.max_pile = max_pile
@@ -68,7 +72,7 @@ class QLearningAgent:
         if self.reduced:
             state = HelperLogic.reduce_state(state)
 
-        actions = list(NimLogic.available_actions(state))
+        actions = NimLogic.available_actions(state)
 
         if not actions:
             return None
@@ -117,7 +121,7 @@ class QLearningAgent:
                 if self.reduced:
                     current_piles = HelperLogic.reduce_state(current_piles)
 
-                actions = list(NimLogic.available_actions(current_piles))
+                actions = NimLogic.available_actions(current_piles)
 
                 if not actions:
                     break

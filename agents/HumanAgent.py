@@ -1,10 +1,18 @@
-class HumanAgent:
+from nim import NimLogic
+
+from agents import Agent
+
+
+class HumanAgent(Agent):
+    def __init__(self):
+        super().__init__()
+
     def reset_stats(self):
         return
 
     def choose_action(self, piles):
         print("Your Turn")
-        available_actions = self.get_available_actions(piles)
+        available_actions = NimLogic.available_actions(piles)
 
         while True:
             pile = self.get_int("Choose Pile: ")
@@ -14,14 +22,6 @@ class HumanAgent:
             print("Invalid move, try again.")
 
         return pile, count
-
-    @staticmethod
-    def get_available_actions(piles):
-        actions = set()
-        for i, pile in enumerate(piles):
-            for j in range(1, pile + 1):
-                actions.add((i, j))
-        return actions
 
     @staticmethod
     def get_int(prompt):

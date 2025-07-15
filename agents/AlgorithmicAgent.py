@@ -1,10 +1,13 @@
 import numpy as np
 
-from nim.NimLogic import NimLogic
+from nim import NimLogic
+
+from .Agent import Agent
 
 
-class AlgorithmicAgent:
+class AlgorithmicAgent(Agent):
     def __init__(self, misere):
+        super().__init__()
         self.misere = misere
 
     def __str__(self):

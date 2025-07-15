@@ -1,6 +1,6 @@
 import numpy as np
 
-from nim.Nim import Nim
+from nim.NimGame import NimGame
 
 from agents.HumanAgent import HumanAgent
 from agents.AlgorithmicAgent import AlgorithmicAgent
@@ -18,7 +18,7 @@ agent2 = AlgorithmicAgent(misere=MISERE)
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1
 
-game = Nim(
+game = NimGame(
     initial_piles=np.random.randint(1, MAX_PILE, size=PILE_COUNT),
     misere=MISERE
 )
