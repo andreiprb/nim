@@ -1,6 +1,6 @@
 from .NimGameState import NimGameState
 
-from agents import Agent
+from helper import HelperAgent
 
 
 class NimGame:
@@ -42,14 +42,14 @@ class NimGame:
         """
         return self.misere
 
-    def play(self, player1: Agent, player2: Agent, verbose: bool = False) -> int | None:
+    def play(self, player1: HelperAgent, player2: HelperAgent, verbose: bool = False) -> int | None:
         """
         Plays a game of Nim between two players.
         """
         player1.reset_stats()
         player2.reset_stats()
 
-        players: list[Agent] = [player1, player2]
+        players: list[HelperAgent] = [player1, player2]
 
         if verbose:
             print(f"{'Misere' if self.misere else 'Normal'} game")
@@ -59,7 +59,7 @@ class NimGame:
                 print(f"Piles: {self.piles}")
 
             current_player: int = self.player
-            current_agent: Agent = players[current_player]
+            current_agent: HelperAgent = players[current_player]
 
             pile: int
             count: int
@@ -76,13 +76,13 @@ class NimGame:
 
         return self.winner
 
-    def _print_move(self, current_player: int, current_agent: Agent, pile: int, count: int) -> None:
+    def _print_move(self, current_player: int, current_agent: HelperAgent, pile: int, count: int) -> None:
         """
         Prints the move information if verbose mode is enabled.
         """
         print(f"Player {current_player + 1} ({current_agent.__class__.__name__}) takes {count} from pile {pile}")
 
-    def _print_winner(self, players: list[Agent]) -> None:
+    def _print_winner(self, players: list[HelperAgent]) -> None:
         """
         Prints the winner information if verbose mode is enabled.
         """

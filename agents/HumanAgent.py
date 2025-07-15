@@ -1,9 +1,9 @@
 from nim import NimLogic
 
-from agents import Agent
+from helper import HelperAgent
 
 
-class HumanAgent(Agent):
+class HumanAgent(HelperAgent):
     def __init__(self):
         super().__init__()
 

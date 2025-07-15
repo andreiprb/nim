@@ -4,12 +4,13 @@ from tqdm import tqdm
 
 from nim import NimLogic
 from nim import NimGameState
+
 from helper import HelperLogic
 
-from agents import Agent
+from helper import HelperAgent
 
 
-class QLearningAgent(Agent):
+class QLearningAgent(HelperAgent):
     def __init__(self, misere, pile_count, max_pile,
                  num_episodes, override=False,
                  alpha=0.3, epsilon=0.3, gamma=1.0,

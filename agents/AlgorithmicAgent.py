@@ -2,10 +2,10 @@ import numpy as np
 
 from nim import NimLogic
 
-from .Agent import Agent
+from helper.HelperAgent import HelperAgent
 
 
-class AlgorithmicAgent(Agent):
+class AlgorithmicAgent(HelperAgent):
     def __init__(self, misere):
         super().__init__()
         self.misere = misere

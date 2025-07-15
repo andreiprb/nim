@@ -1,10 +1,11 @@
 from nim import NimLogic
+
 from helper import HelperLogic
 
-from agents import Agent
+from helper import HelperAgent
 
 
-class MinimaxAgent(Agent):
+class MinimaxAgent(HelperAgent):
     def __init__(self, misere, max_depth, canonical=False, P_pruning=False, aggressive=False):
         super().__init__()
 
