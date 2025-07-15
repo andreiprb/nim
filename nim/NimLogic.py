@@ -9,11 +9,14 @@ class NimLogic:
     def available_actions(state: list[int]) -> set[tuple[int, int]]:
         """
         Returns a set of available actions for the given Nim game state.
+        Each action is represented as a tuple (pile_index, count), where pile_index is the index of the pile.
         """
         actions: set[tuple[int, int]] = set()
+
         for i, pile in enumerate(state):
             for j in range(1, pile + 1):
                 actions.add((i, j))
+
         return actions
 
     @staticmethod
