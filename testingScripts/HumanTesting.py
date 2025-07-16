@@ -4,15 +4,15 @@ from nim import NimGame
 
 from base import BaseAgent
 
-from agents import HumanAgent
-from agents import AlgorithmicAgent
+from otheragents import HumanAgent
+from otheragents import MathematicalAgent
 
 MAX_PILE: int = 7
 PILE_COUNT: int = 4
 MISERE: bool = np.random.rand() < 0.5
 
 agent1: BaseAgent = HumanAgent()
-agent2: BaseAgent = AlgorithmicAgent(misere=MISERE)
+agent2: BaseAgent = MathematicalAgent(misere=MISERE)
 
 if np.random.rand() < 0.5:
     agent1, agent2 = agent2, agent1

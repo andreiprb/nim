@@ -5,13 +5,13 @@ from nim.NimLogic import NimLogic
 from base.BaseAgent import BaseAgent
 
 
-class AlgorithmicAgent(BaseAgent):
+class MathematicalAgent(BaseAgent):
     """
     An agent that uses the known mathematical strategy to play Nim.
     """
     def __init__(self, misere):
         """
-        Initializes the AlgorithmicAgent.
+        Initializes the MathematicalAgent.
         """
         super().__init__()
         self.misere: bool = misere
@@ -27,6 +27,12 @@ class AlgorithmicAgent(BaseAgent):
         Resets the statistics of the agent.
         """
         pass
+
+    def get_stats(self) -> tuple | None:
+        """
+        Returns the statistics of the agent.
+        """
+        return None
 
     def choose_action(self, state: list[int]) -> tuple[int, int]:
         """

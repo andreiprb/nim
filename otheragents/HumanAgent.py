@@ -25,6 +25,12 @@ class HumanAgent(BaseAgent):
         """
         return
 
+    def get_stats(self) -> tuple | None:
+        """
+        Returns the statistics of the agent.
+        """
+        return None
+
     def choose_action(self, piles: list[int]) -> tuple[int, int]:
         """
         Prompts the human player to choose an action based on the current piles.
@@ -33,8 +39,8 @@ class HumanAgent(BaseAgent):
         available_actions: set[tuple[int, int]] = NimLogic.available_actions(piles)
 
         while True:
-            pile: int = self.get_int("Choose Pile: ")
-            count: int = self.get_int("Choose Count: ")
+            pile: int = self._get_int("Choose Pile: ")
+            count: int = self._get_int("Choose Count: ")
 
             if (pile, count) in available_actions:
                 break
@@ -44,7 +50,7 @@ class HumanAgent(BaseAgent):
         return pile, count
 
     @staticmethod
-    def get_int(prompt: str) -> int:
+    def _get_int(prompt: str) -> int:
         """
         Prompts the user for an integer input until a valid integer is provided.
         """
@@ -57,3 +63,4 @@ class HumanAgent(BaseAgent):
                 continue
 
         return -1
+

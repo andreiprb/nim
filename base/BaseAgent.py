@@ -10,3 +10,6 @@ class BaseAgent:
 
     def choose_action(self, state: list[int]) -> tuple[int, int]:
         raise NotImplementedError
+
+    def get_stats(self) -> tuple | None:
+        raise NotImplementedError

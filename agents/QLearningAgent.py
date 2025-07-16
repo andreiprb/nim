@@ -62,6 +62,12 @@ class QLearningAgent(BaseAgent):
         """
         pass
 
+    def get_stats(self) -> tuple | None:
+        """
+        Returns the statistics of the agent.
+        """
+        return None
+
     def choose_action(self, state: list[int], training: bool = False) -> tuple[int, int]:
         """
         Chooses an action based on the current state of the game.
