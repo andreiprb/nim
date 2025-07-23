@@ -161,7 +161,8 @@ class QLearningAgent(BaseAgent):
                 current_piles: list[int] = game_state.piles.copy()
                 index_mapping: list[int]
 
-                current_piles, index_mapping = self._preprocess_state(current_piles)
+                current_piles, index_mapping = self._preprocess_state(
+                    current_piles)
 
                 actions: set[tuple[int, int]] = NimLogic.available_actions(
                     current_piles)
