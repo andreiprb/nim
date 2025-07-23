@@ -42,7 +42,8 @@ class NimGame:
         """
         return self.misere
 
-    def play(self, player1: BaseAgent, player2: BaseAgent, verbose: bool = False) -> int | None:
+    def play(self, player1: BaseAgent, player2: BaseAgent,
+             verbose: bool = False) -> int | None:
         """
         Plays a game of nim between two players.
         """
@@ -76,14 +77,18 @@ class NimGame:
 
         return self.winner
 
-    def _print_move(self, current_player: int, current_agent: BaseAgent, pile: int, count: int) -> None:
+    def _print_move(self, current_player: int, current_agent: BaseAgent,
+                    pile: int, count: int) -> None:
         """
         Prints the move information if verbose mode is enabled.
         """
-        print(f"Player {current_player + 1} ({current_agent.__class__.__name__}) takes {count} from pile {pile}")
+        print(f"Player {current_player + 1} "
+              f"({current_agent.__class__.__name__}) "
+              f"takes {count} from pile {pile}")
 
     def _print_winner(self, players: list[BaseAgent]) -> None:
         """
         Prints the winner information if verbose mode is enabled.
         """
-        print(f"Player {self.winner + 1} ({players[self.winner].__class__.__name__}) wins!\n")
+        print(f"Player {self.winner + 1} "
+              f"({players[self.winner].__class__.__name__}) wins!\n")
