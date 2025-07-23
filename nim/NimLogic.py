@@ -3,12 +3,12 @@ import numpy as np
 
 class NimLogic:
     """
-    Contains the logic for the Nim game, including state manipulation and action selection.
+    Contains the logic for the nim game, including state manipulation and action selection.
     """
     @staticmethod
     def available_actions(state: list[int]) -> set[tuple[int, int]]:
         """
-        Returns a set of available actions for the given Nim game state.
+        Returns a set of available actions for the given nim game state.
         Each action is represented as a tuple (pile_index, count), where pile_index is the index of the pile.
         """
         actions: set[tuple[int, int]] = set()
@@ -46,14 +46,14 @@ class NimLogic:
     @staticmethod
     def nim_sum(state: list[int]) -> int:
         """
-        Computes the Nim-sum of the given state.
+        Computes the nim-sum of the given state.
         """
         return np.bitwise_xor.reduce(state)
 
     @staticmethod
     def is_p_position(state: list[int], misere: bool) -> bool:
         """
-        Determines if the given state is a P-position in Nim.
+        Determines if the given state is a P-position in nim.
         """
         if misere and not any(pile > 1 for pile in state):
             return bool(sum(1 for pile in state if pile == 1) % 2)

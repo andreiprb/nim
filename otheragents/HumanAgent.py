@@ -5,7 +5,7 @@ from base.BaseAgent import BaseAgent
 
 class HumanAgent(BaseAgent):
     """
-    An agent that allows a human player to play the game of Nim.
+    An agent that allows a human player to play the game of nim.
     """
     def __init__(self):
         """
@@ -33,10 +33,12 @@ class HumanAgent(BaseAgent):
 
     def choose_action(self, piles: list[int]) -> tuple[int, int]:
         """
-        Prompts the human player to choose an action based on the current piles.
+        Prompts the human player to choose an
+        action based on the current piles.
         """
         print("Your Turn")
-        available_actions: set[tuple[int, int]] = NimLogic.available_actions(piles)
+        available_actions: set[tuple[int, int]] = \
+            NimLogic.available_actions(piles)
 
         while True:
             pile: int = self._get_int("Choose Pile: ")
@@ -52,7 +54,8 @@ class HumanAgent(BaseAgent):
     @staticmethod
     def _get_int(prompt: str) -> int:
         """
-        Prompts the user for an integer input until a valid integer is provided.
+        Prompts the user for an integer input
+        until a valid integer is provided.
         """
         while True:
             user_input = input(prompt)

@@ -12,7 +12,7 @@ from base.BaseAgent import BaseAgent
 
 class QLearningAgent(BaseAgent):
     """
-    An agent that uses Q-learning to play Nim.
+    An agent that uses Q-learning to play nim.
     """
     def __init__(self, misere, pile_count, max_pile,
                  num_episodes, override=False,

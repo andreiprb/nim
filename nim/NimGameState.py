@@ -3,11 +3,11 @@ from .NimLogic import NimLogic
 
 class NimGameState:
     """
-    Represents the state of a Nim game.
+    Represents the state of a nim game.
     """
     def __init__(self, initial: list[int], misere: bool):
         """
-        Initializes a new Nim game state.
+        Initializes a new nim game state.
         """
         self.piles: list[int] = initial.copy()
         self.player: int = 0

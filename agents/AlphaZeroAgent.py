@@ -3,7 +3,7 @@ from base import BaseAgent
 
 class AlphaZeroAgent(BaseAgent):
     """
-    An agent that uses AlphaZero-like techniques to play Nim.
+    An agent that uses AlphaZero-like techniques to play nim.
     """
     def __init__(self, misere: bool):
         """

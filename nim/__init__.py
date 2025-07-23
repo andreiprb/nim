@@ -1,5 +1,5 @@
 """
-This module provides the implementation of the Nim game.
+This module provides the implementation of the nim game.
 """
 
 from .NimGame import NimGame

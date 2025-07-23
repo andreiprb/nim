@@ -5,11 +5,11 @@ from base.BaseAgent import BaseAgent
 
 class NimGame:
     """
-    Represents a Nim game with a given initial state and rules.
+    Represents a nim game with a given initial state and rules.
     """
     def __init__(self, initial_piles: list[int], misere: bool):
         """
-        Initializes a new Nim game.
+        Initializes a new nim game.
         """
         self.state: NimGameState = NimGameState(initial_piles, misere)
         self.misere: bool = misere
@@ -44,7 +44,7 @@ class NimGame:
 
     def play(self, player1: BaseAgent, player2: BaseAgent, verbose: bool = False) -> int | None:
         """
-        Plays a game of Nim between two players.
+        Plays a game of nim between two players.
         """
         player1.reset_stats()
         player2.reset_stats()

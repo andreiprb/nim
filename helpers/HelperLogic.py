@@ -7,7 +7,7 @@ class HelperLogic:
     @staticmethod
     def heuristic_evaluation(state: list[int], misere: bool) -> int:
         """
-        Evaluates the given Nim game state and returns a heuristic score.
+        Evaluates the given nim game state and returns a heuristic score.
         Used for the minimax algorithm to determine the desirability of the state.
         """
         greater_piles: int = sum(1 for pile in state if pile > 1)

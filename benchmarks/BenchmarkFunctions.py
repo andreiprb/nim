@@ -18,9 +18,9 @@ class BenchmarkFunctions:
                         initial_piles: np.ndarray, game_modes: np.ndarray,
                         episodes: int) -> np.ndarray | None:
         """
-        Tests the given agents by playing a series of Nim games with random initial piles and game modes.
+        Tests the given agents by playing a series of nim games with random initial piles and game modes.
         Each game is played against an algorithmic agent that uses the known mathematical strategy.
-        Each game is also checked against the expected outcome based on the Nim-sum logic.
+        Each game is also checked against the expected outcome based on the nim-sum logic.
         """
         statistics: np.ndarray = np.full(episodes, None, dtype=object)
         has_data: bool = False
@@ -53,7 +53,7 @@ class BenchmarkFunctions:
                        heap_count: int, max_heap: int, episodes: int,
                        processing: Callable[[np.ndarray], None] | None, save_path_prefix: str = "") -> None:
         """
-        Runs a series of tests for the given agents by simulating Nim games with random initial piles and game modes.
+        Runs a series of tests for the given agents by simulating nim games with random initial piles and game modes.
         """
         print("-" * 60)
         print(f"Configuration: pile_count: {heap_count}, max_pile: {max_heap}")

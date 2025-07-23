@@ -3,7 +3,7 @@ from base import BaseAgent
 
 class MCTSAgent(BaseAgent):
     """
-    An agent that uses Monte Carlo Tree Search (MCTS) to play Nim.
+    An agent that uses Monte Carlo Tree Search (MCTS) to play nim.
     """
     def __init__(self, misere: bool):
         """
