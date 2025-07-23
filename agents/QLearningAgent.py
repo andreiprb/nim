@@ -39,9 +39,11 @@ class QLearningAgent(BaseAgent):
         self.save_dir: str = "../savedAgents/QLearning"
         os.makedirs(self.save_dir, exist_ok=True)
 
-        self.filename: str = (f"qlearning-{pile_count}-{max_pile}-{'misere' if misere else 'normal'}"
-                         f"{'-canonical' if canonical else ''}"
-                         f"{'-reduced' if reduced else ''}-{num_episodes}.json")
+        self.filename: str = (f"qlearning-{pile_count}-{max_pile}"
+                              f"-{'misere' if misere else 'normal'}"
+                              f"{'-canonical' if canonical else ''}"
+                              f"{'-reduced' if reduced else ''}"
+                              f"-{num_episodes}.json")
         self.save_path: str = os.path.join(self.save_dir, self.filename)
 
         if not self._load() and not override:
@@ -54,7 +56,12 @@ class QLearningAgent(BaseAgent):
         """
         Returns a string representation of the agent.
         """
-        return f"{'Reduced ' if self.reduced else 'Canonical ' if self.canonical else ''}QLearning Agent"
+        parts = [
+            "Reduced" if self.reduced else
+            "Canonical" if self.canonical else "",
+            "QLearning Agent"
+        ]
+        return " ".join(part for part in parts if part)
 
     def reset_stats(self):
         """
@@ -68,7 +75,8 @@ class QLearningAgent(BaseAgent):
         """
         return None
 
-    def choose_action(self, state: list[int], training: bool = False) -> tuple[int, int]:
+    def choose_action(self, state: list[int],
+                      training: bool = False) -> tuple[int, int]:
         """
         Chooses an action based on the current state of the game.
         """
@@ -76,8 +84,10 @@ class QLearningAgent(BaseAgent):
         current_piles: list[int]
         current_piles, index_mapping = self._preprocess_state(state)
 
-        actions: set[tuple[int, int]] = NimLogic.available_actions(current_piles)
-        action: tuple[int, int] = self._choose_action(current_piles, actions, training)
+        actions: set[tuple[int, int]] = NimLogic.available_actions(
+            current_piles)
+        action: tuple[int, int] = self._choose_action(
+            current_piles, actions, training)
         action = self._postprocess_action(action, index_mapping)
 
         return action
@@ -88,7 +98,8 @@ class QLearningAgent(BaseAgent):
         """
         return self.q.get((tuple(state), action), 0.0)
 
-    def _set_q_value(self, state: list[int], action: tuple[int, int], value: float) -> None:
+    def _set_q_value(self, state: list[int], action: tuple[int, int],
+                     value: float) -> None:
         """
         Sets the Q-value for a given state-action pair.
         """
@@ -96,29 +107,36 @@ class QLearningAgent(BaseAgent):
 
     def _get_state_value(self, state: list[int]):
         """
-        Computes the maximum Q-value for all available actions in the given state.
+        Computes the maximum Q-value for all available actions in the given
+        state.
         """
         actions: set[tuple[int, int]] = NimLogic.available_actions(state)
         return max((self._get_q_value(state, a) for a in actions), default=0.0)
 
-    def _choose_action(self, state: list[int], actions: set[tuple[int, int]], training: bool = False) -> tuple[int, int]:
+    def _choose_action(self, state: list[int], actions: set[tuple[int, int]],
+                       training: bool = False) -> tuple[int, int]:
         """
         Chooses an action based on the current state and available actions.
-        If training and epsilon-greedy condition is met, a random action is chosen.
+        If training and epsilon-greedy condition is met, a random action is
+        chosen.
         """
         if training and np.random.random() < self.epsilon:
             return NimLogic.random_action(actions)
 
-        q_vals: list[tuple[float, tuple[int, int]]] = [(self._get_q_value(state, a), a) for a in actions]
+        q_vals: list[tuple[float, tuple[int, int]]] = [
+            (self._get_q_value(state, a), a) for a in actions
+        ]
         max_q: float = max(q_vals, key=lambda x: x[0])[0]
         best: list[tuple[int, int]] = [a for q, a in q_vals if q == max_q]
 
         idx: int = np.random.randint(len(best))
         return best[idx]
 
-    def _learn_from_transition(self, state: list[int], action: tuple[int, int], next_state: list[int], game_over: bool) -> None:
+    def _learn_from_transition(self, state: list[int], action: tuple[int, int],
+                               next_state: list[int], game_over: bool) -> None:
         """
-        Updates the Q-value based on the transition from the current state to the next state.
+        Updates the Q-value based on the transition from the current state to
+        the next state.
         """
         current_q: float = self._get_q_value(state, action)
         future_value: float
@@ -136,7 +154,8 @@ class QLearningAgent(BaseAgent):
         Trains the agent by simulating a number of episodes.
         """
         for _ in tqdm(range(num_episodes)):
-            game_state: NimGameState = NimGameState([self.max_pile] * self.pile_count, self.misere)
+            game_state: NimGameState = NimGameState(
+                [self.max_pile] * self.pile_count, self.misere)
 
             while game_state.winner is None:
                 current_piles: list[int] = game_state.piles.copy()
@@ -144,12 +163,13 @@ class QLearningAgent(BaseAgent):
 
                 current_piles, index_mapping = self._preprocess_state(current_piles)
 
-                actions: set[tuple[int, int]] = NimLogic.available_actions(current_piles)
-                action: tuple[int, int] = self._choose_action(current_piles, actions, training=True)
+                actions: set[tuple[int, int]] = NimLogic.available_actions(
+                    current_piles)
+                action: tuple[int, int] = self._choose_action(
+                    current_piles, actions, training=True)
 
                 game_state: NimGameState = game_state.apply_move(
-                    self._postprocess_action(action, index_mapping)
-                )
+                    self._postprocess_action(action, index_mapping))
 
                 new_piles: list[int] = game_state.piles.copy()
                 new_piles, _ = self._preprocess_state(new_piles)
@@ -161,22 +181,26 @@ class QLearningAgent(BaseAgent):
                     game_state.winner is not None
                 )
 
-    def _preprocess_state(self, current_piles: list[int]) -> tuple[list[int], list[int]]:
+    def _preprocess_state(self, current_piles: list[int]) -> \
+            tuple[list[int], list[int]]:
         """
-        Preprocesses the current state of the game to prepare for action selection.
+        Preprocesses the current state of the game to prepare for action
+        selection.
         """
         index_mapping: list[int] = list()
         current_piles: list[int] = current_piles.copy()
 
         if self.canonical:
-            current_piles, index_mapping = HelperLogic.canonicalize_state(current_piles)
+            current_piles, index_mapping = HelperLogic.canonicalize_state(
+                current_piles)
 
         if self.reduced:
             current_piles = HelperLogic.reduce_state(current_piles)
 
         return current_piles, index_mapping
 
-    def _postprocess_action(self, action: tuple[int, int], index_mapping: list[int]) -> tuple[int, int]:
+    def _postprocess_action(self, action: tuple[int, int],
+                            index_mapping: list[int]) -> tuple[int, int]:
         """
         Post-processes the action after it has been chosen.
         """
@@ -223,15 +247,18 @@ class QLearningAgent(BaseAgent):
             with open(self.save_path, 'r') as f:
                 save_dict: dict = json.load(f)
 
-            self.q: dict[tuple[tuple[int, ...], tuple[int, int]], float] = dict()
+            self.q: dict[tuple[tuple[int, ...], tuple[int, int]], float] = \
+                dict()
 
             for key_str, value in save_dict['q_table'].items():
                 state_str: str
                 action_str: str
                 state_str, action_str = key_str.split('|')
 
-                state: tuple[int, ...] = tuple(map(int, state_str.split(',')))
-                action: tuple[int, int] = tuple[int, int](map(int, action_str.split(',')))
+                state: tuple[int, ...] = tuple(
+                    map(int, state_str.split(',')))
+                action: tuple[int, int] = tuple[int, int](
+                    map(int, action_str.split(',')))
 
                 self.q[(state, action)] = value
 
