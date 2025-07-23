@@ -33,8 +33,8 @@ class HumanAgent(BaseAgent):
 
     def choose_action(self, piles: list[int]) -> tuple[int, int]:
         """
-        Prompts the human player to choose an
-        action based on the current piles.
+        Prompts the human player to choose an action based on the current
+        piles.
         """
         print("Your Turn")
         available_actions: set[tuple[int, int]] = \
@@ -54,8 +54,8 @@ class HumanAgent(BaseAgent):
     @staticmethod
     def _get_int(prompt: str) -> int:
         """
-        Prompts the user for an integer input
-        until a valid integer is provided.
+        Prompts the user for an integer input until a valid integer is
+        provided.
         """
         while True:
             user_input = input(prompt)
